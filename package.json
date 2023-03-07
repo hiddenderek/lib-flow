@@ -1,5 +1,5 @@
 {
-  "name": "microservice-lib-flow-dc",
+  "name": "@hiddenderek/microservice-lib-flow-dc",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
