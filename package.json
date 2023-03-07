@@ -19,14 +19,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hiddenderek/microservice-implementation.git"
+    "url": "https://github.com/hiddenderek/microservice-lib-flow"
   },
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/hiddenderek/microservice-implementation/issues"
-  },
-  "homepage": "https://github.com/hiddenderek/microservice-implementation#readme",
+  "homepage": "https://github.com/hiddenderek/microservice-lib-flow#readme",
   "devDependencies": {
     "@types/amqplib": "^0.10.1",
     "@types/express": "^4.17.17",
