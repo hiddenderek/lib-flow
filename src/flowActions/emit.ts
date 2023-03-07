@@ -8,7 +8,6 @@ export const emitAction = async (name: string, payload: JsonSchemaToType<JsonSch
     const connection = await amqp.connect(config.rabbitMQ.url)
     const channel = await connection.createChannel()
 
-    console.log('creating exchange!')
 
     const exchangeName = config.rabbitMQ.exchangeName
     await channel.assertExchange(exchangeName, "direct")
