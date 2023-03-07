@@ -1,0 +1,1 @@
+export type AllowedRequests = 'get' | 'post' | 'put'
