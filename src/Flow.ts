@@ -3,11 +3,8 @@ import express from 'express'
 import {listen} from './listen'
 import { generatorRunner } from "./generatorRunner";
 import { JsonSchema } from "./types/jsonSchemaToType";
-import { emitAction } from "./flowActions/emit";
-import { callServiceAction } from "./flowActions/callService";
-import { emitManyAction } from "./flowActions/emitMany";
 
-interface Flow<I> extends flow<Readonly<JsonSchema>> {}
+interface Flow<I> extends flow<I> {}
 
 class Flow<I extends Readonly<JsonSchema>> {
     public constructor(content: flow<I>) {

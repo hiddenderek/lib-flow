@@ -1,95 +1,98 @@
-export type NumberSchema = {
-    type: 'number' | 'integer'
-}
+export type PrimitiveSchema = NumberSchema | StringSchema | BooleanSchema | NullSchema;
 
 export type StringSchema = {
     type: 'string' | 'email' | 'date-time' | 'date' | 'time' | 'uri';
-    enum?: readonly string[]
-}
+    enum?: readonly string[];
+};
+
+export type NumberSchema = {
+    type: 'number' | 'integer';
+};
 
 export type BooleanSchema = {
-    type: 'boolean'
-}
+    type: 'boolean';
+};
 
 export type NullSchema = {
-    type: 'null'
-}
+    type: 'null';
+};
+
+
+export type ComplexSchema = ArraySchema | ObjectSchema;
 
 export type ArraySchema = {
     type: 'array';
     items: JsonSchema;
-}
+};
 
 export type ObjectSchema = {
     type: 'object';
     required?: readonly string[];
     additionalProperties?: JsonSchema | boolean;
     properties: {
-        [key: string]: JsonSchema
-    }
-}
+        [key: string]: JsonSchema;
+    };
+};
 
-export type ValueSchema = ComplexSchema | PrimitveSchema
+export type ValueSchema = ComplexSchema | PrimitiveSchema;
 
-
-export type StringSchemaToType<T extends ValueSchema> = T extends StringSchema & {
-    enum: infer E;
-} ? E extends string[] ? E[number] : string : string
-
-export type PrimitiveSchemaToType<T extends PrimitveSchema> = {
-    null: null;
-    boolean: boolean;
-    number: number;
-    integer : number;
-    string: StringSchemaToType<T>;
-    email:StringSchemaToType<T>;
-    'date-time': StringSchemaToType<T>;
-    date: StringSchemaToType<T>;
-    time: StringSchemaToType<T>;
-    uri: StringSchemaToType<T>;
-}
-
-// where the magic happens
-
-export type ComplexSchemaToType<T extends ComplexSchema> = T extends ArraySchema ? Array<JsonSchemaToType<T>> : T extends ObjectSchema & {
-    required?: infer R;
-    additionalProperties?: infer A;
-} ? {
-    [K in keyof T['properties']] : JsonSchemaToType<T['properties'][K]>
-} & (A extends JsonSchema ? {
-    [key:string]: JsonSchemaToType<A>;
-} : A extends true ? {
-    [key: string] : any
-}: {}) : any
-
-export type ValueSchemaToType<T extends ValueSchema> = T extends ComplexSchema ? ComplexSchemaToType<T> : T extends PrimitveSchema ? PrimitiveSchemaToType<T>[T['type']] : any
-
-export type OperatorSchemaToType<T extends OperatorSchema> = T extends AnyOfSchema ? ValueSchemaToType<T['anyOf'][number]> : T extends AllOfSchema ? UnionToIntersection<ValueSchemaToType<T['allOf'][number]>> : T extends OneOfSchema ? ValueSchemaToType<T['oneOf'][number]> : any
-
-type UnionToIntersection<U> = (U extends any ? (k: U) => void: never) extends (k: infer I) => void ? I : never
+export type OperatorSchema = AnyOfSchema | AllOfSchema | OneOfSchema | NotSchema;
 
 export type AnyOfSchema = {
-    anyOf: readonly ValueSchema[]
-}
+    anyOf: readonly ValueSchema[];
+};
 
 export type AllOfSchema = {
-    allOf: readonly ValueSchema[]
-}
+    allOf: readonly ValueSchema[];
+};
 
 export type OneOfSchema = {
-    oneOf: readonly ValueSchema[]
-}
+    oneOf: readonly ValueSchema[];
+};
 
 export type NotSchema = {
-    not: ValueSchema
+    not: ValueSchema;
+};
+
+export type JsonSchema = PrimitiveSchema | ComplexSchema | OperatorSchema;
+
+export type JsonSchemaToType<T> = 
+    T extends { type: 'string' }
+    ? string
+    : T extends { type: 'number' }
+    ? number
+    : T extends { type: 'boolean' }
+    ? boolean
+    : T extends { type: 'array'; items: infer U }
+    ? JsonSchemaToType<U>[]
+    : T extends {
+        type: 'object';
+        properties: infer U;
+        required?: infer R;
+        additionalProperties?: infer A;
+    }
+    ? (R extends ReadonlyArray<string>
+        ? { [K in keyof U]-?: K extends R[number] ? JsonSchemaToType<U[K]> : JsonSchemaToType<U[K]> | undefined }
+        : { [K in keyof U]-?: JsonSchemaToType<U[K]> | undefined }
+    )
+    & (A extends true
+        ? { [key: string]: any }
+        : {}
+    )
+    : never;
+
+type PersonSchema = {
+    type: "object",
+    properties: {
+        hi: {
+            type: 'string'
+        },
+        numbers: {
+            type: "number"
+        }
+    },
+    required: ["hi"],
+    additionalProperties: true,
 }
 
-export type OperatorSchema = AnyOfSchema | AllOfSchema | OneOfSchema | NotSchema
-
-export type ComplexSchema = ArraySchema | ObjectSchema
-
-export type PrimitveSchema = NumberSchema | StringSchema | BooleanSchema | NullSchema
-
-export type JsonSchema = PrimitveSchema | ComplexSchema | OperatorSchema
-
-export type JsonSchemaToType<T extends JsonSchema> = T extends ValueSchema ? ValueSchemaToType<T> : T extends OperatorSchema ? OperatorSchemaToType<T> : any;
+type Person = JsonSchemaToType<PersonSchema>;

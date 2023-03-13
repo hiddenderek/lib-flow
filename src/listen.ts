@@ -26,7 +26,7 @@ export async function listen<I extends Readonly<JsonSchema>>(bindingKey: string,
     channel.consume(q.queue, async (msg) => {
         console.info(msg)
         if (msg) {
-            let data : JsonSchemaToType<JsonSchema> = {}
+            let data : any
             if (msg?.content) {
                 data = JSON.parse(msg.content.toString())
             }

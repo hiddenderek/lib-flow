@@ -3,7 +3,7 @@ import amqp from 'amqplib'
 import config from '../config';
 
 
-export const emitAction = async (name: string, payload: JsonSchemaToType<JsonSchema>) => {
+export const emitAction = async (name: string, payload: Record<string, any>) => {
     console.log('creating channel!')
     const connection = await amqp.connect(config.rabbitMQ.url)
     const channel = await connection.createChannel()
