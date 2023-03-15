@@ -36,7 +36,7 @@ export default new Flow({
             }
         },
         required: ['hi'],
-        additionalProperties: false,
+        additionalProperties: true,
     } as const,
     body: async function*([input, meta]) {
         console.log('producer!')

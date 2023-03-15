@@ -1,4 +1,3 @@
-import { JsonSchema, JsonSchemaToType } from "../types/jsonSchemaToType"
 import amqp from 'amqplib'
 import config from '../config';
 

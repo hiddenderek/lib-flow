@@ -2,7 +2,7 @@ import { flow } from "./types/flow";
 import express from 'express'
 import {listen} from './listen'
 import { generatorRunner } from "./generatorRunner";
-import { JsonSchema } from "./types/jsonSchemaToType";
+import { JsonSchema } from "./types/jsonSchema";
 
 interface Flow<I> extends flow<I> {}
 

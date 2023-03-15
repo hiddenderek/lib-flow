@@ -1,5 +1,5 @@
 import Ajv from "ajv"
-import { JsonSchema, JsonSchemaToType } from "./types/jsonSchemaToType"
+import { JsonSchema, JsonSchemaToType } from "./types/jsonSchema"
 
 export const validateSchema = (schema: JsonSchema, input: JsonSchemaToType<JsonSchema>) => {
     const ajv = new Ajv()

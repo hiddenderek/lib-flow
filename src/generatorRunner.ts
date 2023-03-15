@@ -1,5 +1,5 @@
 import { flow } from './types/flow';
-import { JsonSchema, JsonSchemaToType } from './types/jsonSchemaToType';
+import { JsonSchema, JsonSchemaToType } from './types/jsonSchema';
 import { validateSchema } from "./validateSchema";
 
 export const generatorRunner = async <I extends Readonly<JsonSchema>>(schema: JsonSchema , input: JsonSchemaToType<I>, body: flow<I>['body'], id: string, executionSource: 'request' | 'queue'): Promise<{data: any, status: number, id: string, executionId: string, executionSource: 'request' | 'queue'}> => {

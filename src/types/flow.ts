@@ -1,5 +1,5 @@
 import { AllowedRequests } from "./allowedRequests"
-import { JsonSchema, JsonSchemaToType } from "./jsonSchemaToType"
+import { JsonSchema, JsonSchemaToType } from "./jsonSchema"
 import { MetaParams } from "./metaParams"
 
 

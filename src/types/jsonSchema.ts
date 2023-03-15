@@ -1,3 +1,29 @@
+export type JsonSchemaToType<T> = 
+    T extends { type: 'string' }
+    ? string
+    : T extends { type: 'number' }
+    ? number
+    : T extends { type: 'boolean' }
+    ? boolean
+    : T extends { type: 'array'; items: infer U }
+    ? JsonSchemaToType<U>[]
+    : T extends {
+        type: 'object';
+        properties: infer U;
+        required?: infer R;
+        additionalProperties?: infer A;
+    }
+    ? (R extends ReadonlyArray<string>
+        ? { [K in keyof U]-?: K extends R[number] ? JsonSchemaToType<U[K]> : JsonSchemaToType<U[K]> | undefined }
+        : { [K in keyof U]-?: JsonSchemaToType<U[K]> | undefined }
+    )
+    & (A extends true
+        ? { [key: string]: any }
+        : {}
+    )
+    : never;
+
+
 export type PrimitiveSchema = NumberSchema | StringSchema | BooleanSchema | NullSchema;
 
 export type StringSchema = {
@@ -16,7 +42,6 @@ export type BooleanSchema = {
 export type NullSchema = {
     type: 'null';
 };
-
 
 export type ComplexSchema = ArraySchema | ObjectSchema;
 
@@ -56,43 +81,3 @@ export type NotSchema = {
 
 export type JsonSchema = PrimitiveSchema | ComplexSchema | OperatorSchema;
 
-export type JsonSchemaToType<T> = 
-    T extends { type: 'string' }
-    ? string
-    : T extends { type: 'number' }
-    ? number
-    : T extends { type: 'boolean' }
-    ? boolean
-    : T extends { type: 'array'; items: infer U }
-    ? JsonSchemaToType<U>[]
-    : T extends {
-        type: 'object';
-        properties: infer U;
-        required?: infer R;
-        additionalProperties?: infer A;
-    }
-    ? (R extends ReadonlyArray<string>
-        ? { [K in keyof U]-?: K extends R[number] ? JsonSchemaToType<U[K]> : JsonSchemaToType<U[K]> | undefined }
-        : { [K in keyof U]-?: JsonSchemaToType<U[K]> | undefined }
-    )
-    & (A extends true
-        ? { [key: string]: any }
-        : {}
-    )
-    : never;
-
-type PersonSchema = {
-    type: "object",
-    properties: {
-        hi: {
-            type: 'string'
-        },
-        numbers: {
-            type: "number"
-        }
-    },
-    required: ["hi"],
-    additionalProperties: true,
-}
-
-type Person = JsonSchemaToType<PersonSchema>;

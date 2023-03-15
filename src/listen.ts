@@ -1,7 +1,7 @@
 import amqp from 'amqplib'
 import config from './config'
 import { flow } from './types/flow';
-import { JsonSchema, JsonSchemaToType } from './types/jsonSchemaToType';
+import { JsonSchema } from './types/jsonSchema';
 import { generatorRunner } from './generatorRunner';
 
 export async function listen<I extends Readonly<JsonSchema>>(bindingKey: string, schema: JsonSchema, body: flow<I>['body'], flowId: string, executionSource: 'request' | 'queue') {
