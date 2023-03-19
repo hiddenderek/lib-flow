@@ -22,7 +22,7 @@ export default new Flow({
         },
         required: ['numbers'],
         additionalProperties: false,
-    },
+    } as const,
     body: async function*([input]) {
         console.log('consumer')
         const {numbers, hi} = input

@@ -5,7 +5,7 @@ import { getToken } from "./getToken"
 export async function getAxiosClient() {
     const {access_token} = await getToken()
     const axiosClient = axios.create({
-        baseURL: config.callService.baseUrl,
+        baseURL: `http://${config.host.hostname}:${config.host.port}`,
         headers: {
             Authorization: `Bearer ${access_token}`
         }

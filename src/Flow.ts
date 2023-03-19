@@ -3,6 +3,7 @@ import express from 'express'
 import {listen} from './listen'
 import { generatorRunner } from "./generatorRunner";
 import { JsonSchema } from "./types/jsonSchema";
+import config from "./config";
 
 interface Flow<I> extends flow<I> {}
 
@@ -30,7 +31,7 @@ class Flow<I extends Readonly<JsonSchema>> {
             next();
         });
 
-        this.router[this.method ? this.method : 'post'](`/api/${this.id}`, async(req: any, res: any) => {
+        this.router[this.method ? this.method : 'post'](`/v${config.flow.version}/flow/start/${this.id}`, async(req: any, res: any) => {
             const result = await generatorRunner<typeof this.input>(this.input, req.body, this.body, this.id, 'request')
             res.status(result.status)
             res.json(result)
