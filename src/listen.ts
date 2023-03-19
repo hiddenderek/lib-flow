@@ -2,7 +2,7 @@ import amqp from 'amqplib'
 import config from './config'
 import { flow } from './types/flow';
 import { JsonSchema } from './types/jsonSchema';
-import { generatorRunner } from './generatorRunner';
+import { flowRunner } from './flowRunner';
 
 export async function listen<I extends Readonly<JsonSchema>>(bindingKey: string, schema: JsonSchema, body: flow<I>['body'], flowId: string, executionSource: 'request' | 'queue') {
     console.info('listen!')
@@ -31,7 +31,7 @@ export async function listen<I extends Readonly<JsonSchema>>(bindingKey: string,
                 data = JSON.parse(msg.content.toString())
             }
             console.info(data)
-            const bodyResult = await generatorRunner(schema, data, body, flowId, executionSource)
+            const bodyResult = await flowRunner(schema, data, body, flowId, executionSource)
             if (bodyResult.status === 200) {
                 channel.ack(msg)
             } else if (bodyResult.status >= 400 ) {

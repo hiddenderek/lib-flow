@@ -5,7 +5,7 @@ import { JsonSchemaToObject } from './types/jsonSchemaToObject'
 import { validateFlowPolicy } from './validateFlowPolicy';
 import { validateSchema } from "./validateSchema";
 
-export const generatorRunner = async <I extends Readonly<JsonSchema>>(schema: JsonSchema , input: JsonSchemaToObject<I>, body: flow<I>['body'], id: string, executionSource: 'request' | 'queue'): Promise<{data: any, status: number, id: string, executionId: string, executionSource: 'request' | 'queue'}> => {
+export const flowRunner = async <I extends Readonly<JsonSchema>>(schema: JsonSchema , input: JsonSchemaToObject<I>, body: flow<I>['body'], id: string, executionSource: 'request' | 'queue'): Promise<{data: any, status: number, id: string, executionId: string, executionSource: 'request' | 'queue'}> => {
     const executionId = Math.random().toString()
     try {
         await emitAction(`flow.${id}.started`, {})  
