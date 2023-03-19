@@ -3,13 +3,15 @@ const config = {
         url: 'amqp://rabbitmq:5672',
         exchangeName: 'microserviceExchange'
     },
-    express: {    
-        httpPort: typeof process != "undefined" ? process?.env?.HTTP_PORT : 8111,
+    opa: {
+        url: 'http://opa:8181'
+    },
+    flow: {
+        version: 0
+    },
+    host: {    
+        port: typeof process != "undefined" ? process?.env?.HTTP_PORT : 8111,
         hostname: typeof process != "undefined" ? process?.env?.HOSTNAME : 'localhost'
     },
 }
-
-const callService = {
-    baseUrl: `http://${config.express.hostname}:${config.express.httpPort}`
-}
-export default {...config, callService}
+export default config
