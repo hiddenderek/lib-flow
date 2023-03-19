@@ -6,7 +6,11 @@ export async function validateFlowPolicy(flowId: string): Promise<boolean> {
         `${config.opa.url}/v1/data/policy/allow`,
         {
             input:{
-                flowId
+                request: {
+                    params: {
+                        flowId
+                    }
+                }
             }
         }
     )
