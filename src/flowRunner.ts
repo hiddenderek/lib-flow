@@ -41,6 +41,7 @@ export const flowRunner = async <I extends Readonly<JsonSchema>>(schema: JsonSch
         let curVal: {value?: any; done?: boolean } = {value: undefined, done: false};
         while(curVal?.done === false) {
             curVal = await bodyInstance.next(curVal.value)
+            console.log(curVal.value)
             if (curVal?.value?.__flowAction__) {
                 await actionHandler({...curVal?.value, meta})
             }
