@@ -1,14 +1,9 @@
 import config from "../config";
 import amqp from 'amqplib';
 import { v4 as uuid } from 'uuid';
-import { JsonSchema } from "../types/jsonSchema";
+import { MetaParams } from "src/types/metaParams";
 
-export const emitAction = async (name: string, payload: Record<string, any>, token?: string) => {
-    if (!token) {
-        // @ts-ignore
-        const [input, meta] : [input: JsonSchema, meta: {token?: string}]= emitAction.caller.arguments[0]
-        token = meta?.token
-    }
+export const emitAction = async (name: string, payload: Record<string, any>, meta?: MetaParams) => {
     console.log('creating channel!')
     const connection = await amqp.connect(config.rabbitMQ.url)
     const channel = await connection.createChannel()
@@ -24,7 +19,7 @@ export const emitAction = async (name: string, payload: Record<string, any>, tok
                 logType: name,
                 data: payload,
                 timeStamp: new Date().toISOString(),
-                token,
+                token: meta?.token,
                 trackingId
             })
         )
