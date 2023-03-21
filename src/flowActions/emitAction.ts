@@ -5,6 +5,7 @@ import { JsonSchema } from "../types/jsonSchema";
 
 export const emitAction = async (name: string, payload: Record<string, any>, token?: string) => {
     if (!token) {
+        // @ts-ignore
         const [input, meta] : [input: JsonSchema, meta: {token?: string}]= emitAction.caller.arguments[0]
         token = meta?.token
     }
