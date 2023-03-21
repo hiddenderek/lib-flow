@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios"
-import config from "src/config"
+import config from "../config"
 
 export const authenticateToken = async (token?: string) : Promise<'Success' | 'Null' | 'Error'> => {
     // TODO: disable this return and research authentication further
