@@ -26,14 +26,15 @@ export async function listen<I extends Readonly<JsonSchema>>(bindingKey: string,
     channel.consume(q.queue, async (msg) => {
         console.info(msg)
         if (msg) {
-            let data : any
+            let content : any
             if (msg?.content) {
-                data = JSON.parse(msg.content.toString())
+                content = JSON.parse(msg.content.toString())
             }
-            console.info(data)
-            let token = data?.data?.token
-
-            const bodyResult = await flowRunner(schema, data, body, flowId, executionSource, stateless, token)
+            console.info(content)
+            let token = content?.token
+            const {logType, data, timeStamp} = content
+            const input = {id: logType, data, timeStamp} as any
+            const bodyResult = await flowRunner(schema, input, body, flowId, executionSource, stateless, token)
             if (bodyResult.status === 200) {
                 channel.ack(msg)
             } else if (bodyResult.status >= 400 ) {
