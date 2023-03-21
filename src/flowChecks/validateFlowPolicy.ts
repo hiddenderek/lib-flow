@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios"
-import config from "./config"
+import config from "../config"
 
 export async function validateFlowPolicy(flowId: string): Promise<boolean> {
     const result: AxiosResponse<{result: boolean}> = await axios.post(
