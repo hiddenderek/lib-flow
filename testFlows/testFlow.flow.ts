@@ -1,5 +1,4 @@
-import Flow from "../src/Flow";
-import {emitAction} from "../src/flowActions/emit"
+import Flow, {emit} from "../src/index";
 export default new Flow({
     id: 'testFlow',
     name: 'a new flow',
@@ -43,7 +42,7 @@ export default new Flow({
         console.log(input)
         const bob = input.hi + 2
         console.log(bob) 
-        await emitAction('test3RoutingKey', {number: bob})
+        emit('test3RoutingKey', {number: bob})
         return bob
     }
 })

@@ -3,8 +3,9 @@ import config from './config'
 import { flow } from './types/flow';
 import { JsonSchema } from './types/jsonSchema';
 import { flowRunner } from './flowRunner';
+import { getToken } from './flowAuth/getToken';
 
-export async function listen<I extends Readonly<JsonSchema>>(bindingKey: string, schema: JsonSchema, body: flow<I>['body'], flowId: string, executionSource: 'request' | 'queue') {
+export async function listen<I extends Readonly<JsonSchema>>(bindingKey: string, schema: JsonSchema, body: flow<I>['body'], flowId: string, executionSource: 'request' | 'queue', stateless: boolean) {
     console.info('listen!')
     let connection
     try {
@@ -31,7 +32,9 @@ export async function listen<I extends Readonly<JsonSchema>>(bindingKey: string,
                 data = JSON.parse(msg.content.toString())
             }
             console.info(data)
-            const bodyResult = await flowRunner(schema, data, body, flowId, executionSource)
+            let token = data?.data?.token
+
+            const bodyResult = await flowRunner(schema, data, body, flowId, executionSource, stateless, token)
             if (bodyResult.status === 200) {
                 channel.ack(msg)
             } else if (bodyResult.status >= 400 ) {

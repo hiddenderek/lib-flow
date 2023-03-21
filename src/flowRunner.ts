@@ -1,39 +1,51 @@
-import { emitAction } from './flowActions/emit';
+import { emitAction } from './flowActions/emitAction';
 import { flow } from './types/flow';
 import { JsonSchema } from './types/jsonSchema';
 import { JsonSchemaToObject } from './types/jsonSchemaToObject'
-import { validateFlowPolicy } from './validateFlowPolicy';
-import { validateSchema } from "./validateSchema";
+import { validateFlowPolicy } from './flowChecks/validateFlowPolicy';
+import { validateSchema } from "./flowChecks/validateSchema";
+import { authenticateToken } from './flowChecks/authenticateToken';
+import { logError } from './errors/logError';
 
-export const flowRunner = async <I extends Readonly<JsonSchema>>(schema: JsonSchema , input: JsonSchemaToObject<I>, body: flow<I>['body'], id: string, executionSource: 'request' | 'queue'): Promise<{data: any, status: number, id: string, executionId: string, executionSource: 'request' | 'queue'}> => {
+export const flowRunner = async <I extends Readonly<JsonSchema>>(schema: JsonSchema , input: JsonSchemaToObject<I>, body: flow<I>['body'], id: string, executionSource: 'request' | 'queue', stateless: boolean, token?: string): Promise<{data: any, status: number, id: string, executionId: string, executionSource: 'request' | 'queue'}> => {
     const executionId = Math.random().toString()
     try {
-        await emitAction(`flow.${id}.started`, {})  
+        await emitAction(`flow.${id}.started`, {flowId: id, executionId, stateless})  
         console.info(`flow '${id}' started`)
-        const schemaResult = validateSchema(schema, input)
-        if (schemaResult.valid === false) {
-            await emitAction(`flow.${id}.failed`, { reason: "Invalid Schema" })  
-            console.info(`flow '${id}' failed. Reason: Invalid Schema. Errors: ${JSON.stringify(schemaResult.validate?.errors)}`)
-            return {data: schemaResult.validate?.errors, status: 422, id, executionId, executionSource}
-        }   
+
         const flowPolicyResult = await validateFlowPolicy(id)
         if (flowPolicyResult === false) {
-            await emitAction(`flow.${id}.failed`, { reason: "Not Found" })   
-            console.info(`flow '${id}' failed. Reason: Not Found.`)  
+            await logError("Not Found", id, executionId, stateless) 
             return {data: {}, status: 404, id, executionId, executionSource}        
         }
 
-        const bodyInstance = body([input, {flowId:id, executionId, startTime: new Date().toISOString()}])
+        const userAuthResult = await authenticateToken(token)
+        if (userAuthResult === 'Null') {
+            await logError("Null Authenticate", id, executionId, stateless) 
+            return {data: {}, status: 401, id, executionId, executionSource}            
+        } else if (userAuthResult === 'Error') {
+            await logError("Authentication Errror", id, executionId, stateless) 
+            return {data: {}, status: 403, id, executionId, executionSource}            
+        }
+
+        const schemaResult = validateSchema(schema, input)
+        if (schemaResult.valid === false) {
+            await logError("Invalid Schema", id, executionId, stateless, JSON.stringify(schemaResult.validate?.errors)) 
+            return {data: schemaResult.validate?.errors, status: 422, id, executionId, executionSource}
+        }   
+
+        // Run the body of the flow if all flow checks are successful
+        const bodyInstance = body([input, {flowId: id, executionId, startTime: new Date().toISOString(), token}])
         let curVal: {value?: any; done?: boolean } = {value: undefined, done: false};
         while(curVal?.done === false) {
             curVal = await bodyInstance.next(curVal.value)
         }
-        await emitAction(`flow.${id}.completed`, {})  
+
+        await emitAction(`flow.${id}.completed`, {flowId: id, executionId, stateless})  
         console.info(`flow '${id}' completed`)
         return {data: curVal.value, status: curVal.value?.resStatus ? curVal.value.resStatus : 200, id, executionId, executionSource};
     } catch (e) {
-        await emitAction(`flow.${id}.failed`, { reason: "An Error Occured" })  
-        console.info(`flow '${id}' failed. Reason: An error occurred. Errors: ${JSON.stringify(e)}`)
+        await logError("Internal Server Error", id, executionId, stateless, JSON.stringify(e)) 
         return {data: e, status: 500, id, executionId, executionSource};
     }
 }

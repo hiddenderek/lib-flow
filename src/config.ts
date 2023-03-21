@@ -7,7 +7,8 @@ const config = {
         url: 'http://opa:8181'
     },
     flow: {
-        version: 0
+        version: 0,
+        token: 'super-secret'
     },
     host: {    
         port: typeof process != "undefined" ? process?.env?.HTTP_PORT : 8111,
