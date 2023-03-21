@@ -1,4 +1,4 @@
-import { flow } from "./types/flow";
+import { IFlow } from "./interfaces/IFlow";
 import express from 'express'
 import {listen} from './listen'
 import { flowRunner } from "./flowRunner";
@@ -6,10 +6,10 @@ import { JsonSchema } from "./types/jsonSchema";
 import { parseToken } from "./utils/parseToken";
 import config from "./config";
 
-interface Flow<I> extends flow<I> {}
+interface Flow<I> extends IFlow<I> {}
 
 class Flow<I extends Readonly<JsonSchema>> {
-    public constructor(content: flow<I>) {
+    public constructor(content: IFlow<I>) {
         this.id = content.id;
         this.name = content.name;
         this.stateless = content.stateless;

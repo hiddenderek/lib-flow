@@ -1,12 +1,12 @@
 import Flow from "./Flow"
 import { callServiceAction } from "./flowActions/callService"
-import { emitAction } from "./flowActions/emitAction"
-import { emitManyAction } from "./flowActions/emitManyAction"
+import { emitManyWrapper } from "./flowActions/emitMany/emitManyWrapper"
+import { emitWrapper } from "./flowActions/emit/emitWrapper"
 import { flowImport } from "./flowImport"
 
-export const emit = emitAction
+export const emit = emitWrapper
 
-export const emitMany = emitManyAction
+export const emitMany = emitManyWrapper
 
 export const callService = callServiceAction
 

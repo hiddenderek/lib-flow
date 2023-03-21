@@ -1,1 +1,0 @@
-export type Event = {name: string, payload: Record<string, any>}

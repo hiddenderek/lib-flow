@@ -1,9 +1,9 @@
-import config from "../config";
+import config from "../../config";
 import amqp from 'amqplib';
 import { v4 as uuid } from 'uuid';
-import { MetaParams } from "src/types/metaParams";
+import { IMeta } from "../../interfaces/IMeta";
 
-export const emitAction = async (name: string, payload: Record<string, any>, meta?: MetaParams) => {
+export const emitAction = async (options: {name: string, payload: Record<string, any>, meta?: IMeta}) => {
     console.log('creating channel!')
     const connection = await amqp.connect(config.rabbitMQ.url)
     const channel = await connection.createChannel()
@@ -13,19 +13,19 @@ export const emitAction = async (name: string, payload: Record<string, any>, met
 
     await channel.publish(
         exchangeName,
-        name,
+        options.name,
         Buffer.from(
             JSON.stringify({
-                logType: name,
-                data: payload,
+                logType: options.name,
+                data: options.payload,
                 timeStamp: new Date().toISOString(),
-                token: meta?.token,
+                token: options?.meta?.token,
                 trackingId
             })
         )
     )
 
-    console.info(`Publishing event with name ${name} (tracking id: ${trackingId}) to exchange ${exchangeName} with data: ${JSON.stringify(payload)}`)
+    console.info(`Publishing event with name ${options.name} (tracking id: ${trackingId}) to exchange ${exchangeName} with data: ${JSON.stringify(options.payload)}`)
 
     await channel.close()
 }
