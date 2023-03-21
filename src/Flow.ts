@@ -27,7 +27,8 @@ class Flow<I extends Readonly<JsonSchema>> {
     private router = express.Router()
 
     public makeRoute = () => {
-        this.router.use(function timeLog(req, res, next) {
+        // @ts-ignore
+        this.router.use(function timeLog(req , res, next) {
             next();
         });
 

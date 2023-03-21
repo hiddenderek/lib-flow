@@ -42,7 +42,7 @@ export default new Flow({
         console.log(input)
         const bob = input.hi + 2
         console.log(bob) 
-        emit('test3RoutingKey', {number: bob})
+        await emit('test3RoutingKey', {number: bob}, meta)
         return bob
     }
 })

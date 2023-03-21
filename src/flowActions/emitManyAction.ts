@@ -1,11 +1,10 @@
 import { JsonSchema } from "../types/jsonSchema"
 import { Event } from "../types/event"
 import { emitAction } from "./emitAction"
+import { MetaParams } from "src/types/metaParams"
 
-export const emitManyAction = async(events: Event[]) => {
-    // @ts-ignore
-    const [input, meta] : [input: JsonSchema, meta: {token?: string}]= emitAction.caller.arguments[0]
+export const emitManyAction = async(events: Event[], meta?: MetaParams) => {
     for (let i = 0; i < events.length; i++) {
-        await emitAction(events[i].name, events[i].payload, meta?.token)
+        await emitAction(events[i].name, events[i].payload, meta)
     }
 }
