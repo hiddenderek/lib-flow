@@ -3,7 +3,7 @@ import express from 'express'
 import {listen} from './listen'
 import { flowRunner } from "./flowRunner";
 import { JsonSchema } from "./types/jsonSchema";
-import { parseBearer } from "./utils.ts/parseBearer";
+import { parseBearer } from "./utils/parseBearer";
 import config from "./config";
 
 interface Flow<I> extends flow<I> {}
