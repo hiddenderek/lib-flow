@@ -1,4 +1,4 @@
-import { JsonSchema } from "src/types/jsonSchema"
+import { JsonSchema } from "../types/jsonSchema"
 import { Event } from "../types/event"
 import { emitAction } from "./emitAction"
 

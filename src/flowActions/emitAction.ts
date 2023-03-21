@@ -1,7 +1,7 @@
 import config from "../config";
 import amqp from 'amqplib';
 import { v4 as uuid } from 'uuid';
-import { JsonSchema } from "src/types/jsonSchema";
+import { JsonSchema } from "../types/jsonSchema";
 
 export const emitAction = async (name: string, payload: Record<string, any>, token?: string) => {
     if (!token) {
