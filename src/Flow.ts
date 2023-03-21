@@ -3,6 +3,7 @@ import express from 'express'
 import {listen} from './listen'
 import { flowRunner } from "./flowRunner";
 import { JsonSchema } from "./types/jsonSchema";
+import { parseBearer } from "./utils.ts/parseBearer";
 import config from "./config";
 
 interface Flow<I> extends flow<I> {}
@@ -18,21 +19,21 @@ class Flow<I extends Readonly<JsonSchema>> {
         this.method = content?.method
         if (content?.triggers?.events) {
             content.triggers.events.forEach((event) => {
-                listen<typeof content.input>(event, this.input, this.body, this.id, 'queue' )
+                listen<typeof content.input>(event, this.input, this.body, this.id, 'queue', this.stateless )
             })
         }
     }
 
     private router = express.Router()
 
-    
     public makeRoute = () => {
         this.router.use(function timeLog(req, res, next) {
             next();
         });
 
         this.router[this.method ? this.method : 'post'](`/v${config.flow.version}/flow/start/${this.id}`, async(req: any, res: any) => {
-            const result = await flowRunner<typeof this.input>(this.input, req.body, this.body, this.id, 'request')
+            const token = parseBearer(req.headers['Authorization']) 
+            const result = await flowRunner<typeof this.input>(this.input, req.body, this.body, this.id, 'request', this.stateless, token)
             res.status(result.status)
             res.json(result)
         })  
