@@ -1,5 +1,6 @@
 import { IEmitAction } from "../interfaces/IEmitAction";
 import { IEmitMany } from "../interfaces/IEmitMany";
+import { IActionHandler } from "../interfaces/IActionHandler";
 import { emitAction } from "./emit/emitAction";
 import { emitManyAction } from "./emitMany/emitManyAction";
 
