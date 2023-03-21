@@ -1,4 +1,4 @@
 export interface IActionHandler {
-    flowAction: string, 
+    __flowAction__: string, 
     [key:string] : any
 }
