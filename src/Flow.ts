@@ -3,7 +3,7 @@ import express from 'express'
 import {listen} from './listen'
 import { flowRunner } from "./flowRunner";
 import { JsonSchema } from "./types/jsonSchema";
-import { parseBearer } from "./utils/parseBearer";
+import { parseToken } from "./utils/parseToken";
 import config from "./config";
 
 interface Flow<I> extends flow<I> {}
@@ -32,7 +32,8 @@ class Flow<I extends Readonly<JsonSchema>> {
         });
 
         this.router[this.method ? this.method : 'post'](`/v${config.flow.version}/flow/start/${this.id}`, async(req: any, res: any) => {
-            const token = parseBearer(req.headers['Authorization']) 
+            const authenticateToken = req.headers['authorization'] || ''
+            const token = parseToken(authenticateToken)
             const result = await flowRunner<typeof this.input>(this.input, req.body, this.body, this.id, 'request', this.stateless, token)
             res.status(result.status)
             res.json(result)
