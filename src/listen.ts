@@ -1,10 +1,10 @@
 import amqp from 'amqplib'
 import config from './config'
-import { flow } from './types/flow';
+import { IFlow } from './interfaces/IFlow';
 import { JsonSchema } from './types/jsonSchema';
 import { flowRunner } from './flowRunner';
 
-export async function listen<I extends Readonly<JsonSchema>>(bindingKey: string, schema: JsonSchema, body: flow<I>['body'], flowId: string, executionSource: 'request' | 'queue', stateless: boolean) {
+export async function listen<I extends Readonly<JsonSchema>>(bindingKey: string, schema: JsonSchema, body: IFlow<I>['body'], flowId: string, executionSource: 'request' | 'queue', stateless: boolean) {
     console.info('listen!')
     let connection
     try {

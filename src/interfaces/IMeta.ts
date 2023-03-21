@@ -1,4 +1,4 @@
-export type MetaParams = {
+export interface IMeta {
     flowId: string,
     executionId: string,
     startTime: string,
