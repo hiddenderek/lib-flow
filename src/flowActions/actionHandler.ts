@@ -5,9 +5,9 @@ import { emitAction } from "./emit/emitAction";
 import { emitManyAction } from "./emitMany/emitManyAction";
 
 export const actionHandler = async (input: IActionHandler) => {
-    const {flowAction, ...values} = JSON.parse(JSON.stringify(input)) as IActionHandler
-    console.log('ACTON: '  + flowAction)
-    switch (flowAction) {
+    const {__flowAction__, ...values} = JSON.parse(JSON.stringify(input)) as IActionHandler
+    console.log('ACTON: '  + __flowAction__)
+    switch (__flowAction__) {
         case 'emit': 
             await emitAction(values as IEmitAction)
             break;
