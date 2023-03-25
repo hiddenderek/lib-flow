@@ -2,6 +2,7 @@ import config from "../../config";
 import amqp from 'amqplib';
 import { v4 as uuid } from 'uuid';
 import { IMeta } from "../../interfaces/IMeta";
+import { logMessage } from "src/logging/logMessage";
 
 export const emitAction = async (options: {name: string, payload: Record<string, any>, meta?: IMeta}) => {
     console.log('creating channel!')
@@ -20,12 +21,13 @@ export const emitAction = async (options: {name: string, payload: Record<string,
                 data: options.payload,
                 timeStamp: new Date().toISOString(),
                 token: options?.meta?.token,
+                requestId: options?.meta?.requestId,
                 trackingId
             })
         )
     )
 
-    console.info(`Publishing event with name ${options.name} (tracking id: ${trackingId}) to exchange ${exchangeName} with data: ${JSON.stringify(options.payload)}`)
+    logMessage(`Publishing event with name ${options.name} (tracking id: ${trackingId}) to exchange ${exchangeName} with data: ${JSON.stringify(options.payload)}`)
 
     await channel.close()
 }

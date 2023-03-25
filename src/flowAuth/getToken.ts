@@ -1,17 +1,18 @@
 import axios, { AxiosResponse } from "axios"
 import config from "../config"
 
-export async function getToken(secret: string): Promise<{access_token: string}> {
+export async function getToken(type?: 'oauth' | 'exchange'): Promise<{access_token: string}> {
+    return {access_token: 'asdf1234hi'}
     const baseURL = process.env.API_GATEWAY_URL || `http://${config.host.hostname}:${config.host.port}`
     const token: AxiosResponse<{access_token: string}> = await axios.post(
-        `${baseURL}/v4/iam/oauth2/token`,
+        `${baseURL}${type === "oauth" || type === undefined ? "/v4/iam/oauth2/token" : "/v4/iam/exchange"}`,
         {
-            client_id: "web-app",
-            client_secret: secret,
-            realm: "default",
+            client_id: process.env.CLIENT_ID || 'local-client-id',
+            client_secret: process.env.CLIENT_SECRET || 'super-client-secret',
+            realm: process.env.CLIENT_REALM || 'default',
             grant_type: "client_credentials",
             scope: "openid",
-            tenant: "sfi"
+            tenant: "nelnet"
         },
         {
             headers: {
