@@ -1,6 +1,6 @@
 {
   "name": "@hiddenderek/microservice-lib-flow-dc",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "",
   "main": "dist/index.js",
   "files": [

@@ -2,7 +2,7 @@ import config from "../../config";
 import amqp from 'amqplib';
 import { v4 as uuid } from 'uuid';
 import { IMeta } from "../../interfaces/IMeta";
-import { logMessage } from "src/logging/logMessage";
+import { logMessage } from "../../logging/logMessage";
 
 export const emitAction = async (options: {name: string, payload: Record<string, any>, meta?: IMeta}) => {
     console.log('creating channel!')
