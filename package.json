@@ -10,12 +10,14 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
+    "test:integration": "jest --runInBand -c jest.config.integration.js",
     "bump": "npm --no-git-tag-version version",
     "prettier": "prettier \"{.,,{src}/**/}*.@(ts|js|json|html|tsx|jsx)\" --list-different -- --write",
-    "dev": "set NODE_PATH=./src&& nodemon -L src/server.ts  --ignore public/",
+    "dev": "set NODE_PATH=./test&& nodemon -L test/testFlows/flowServer.ts  --ignore public/",
     "up": "docker-compose up -d",
     "down": "docker-compose down -v",
-    "deploy:implementation": "npm run up -- --no-deps --build node-app"
+    "deploy:app": "npm run up -- --no-deps --build app",
+    "deploy:policies": "docker-compose rm -sv --force opa && docker-compose up -d opa"
   },
   "repository": {
     "type": "git",
@@ -28,6 +30,7 @@
     "@types/amqplib": "^0.10.1",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.4.0",
+    "@types/lru-cache": "^7.10.10",
     "@types/node-cron": "^3.0.7",
     "eslint": "^8.35.0",
     "jest": "^29.4.3",
@@ -45,6 +48,7 @@
     "axios-retry": "^3.4.0",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "lru-cache": "^8.0.4",
     "node-cron": "^3.0.2",
     "pg": "^8.9.0",
     "ts-jest": "^29.0.5",

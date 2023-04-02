@@ -1,9 +1,10 @@
-import Flow, {emit} from "../src/index";
+import Flow, {emit} from "../../../src/index";
+import { add } from "../shared/functions/add";
 export default new Flow({
-    id: 'testFlow',
+    id: 'emitFlow',
     name: 'a new flow',
     stateless: true,
-    triggers: {events: ['testBindingKey']},
+    triggers: { events: ['waitForEventFlowTrigger']},
     input: {
         type: "object",
         properties: {
@@ -34,15 +35,16 @@ export default new Flow({
                 additionalProperties: false,
             }
         },
-        required: ['hi'],
         additionalProperties: true,
     } as const,
     body: async function*([input, meta]) {
-        console.log('producer!')
-        console.log(input)
-        const bob = input.hi + 2
-        console.log(bob) 
-        yield emit('test3RoutingKey', {number: bob})
+        const bob = input?.hi ?? 22
+        yield 1 + 1
+        yield* add(452323, 40232323)
+        yield* add(4523323, 40232323)
+        yield* add(452323, 40232323)
+        yield* add(4523323, 40232323)
+        yield emit('emitFlowTrigger', {numbers: bob})
         return bob
     }
 })

@@ -1,1 +1,1 @@
-export type IEvent = {name: string, payload: Record<string, any>}
+export type IEvent = {name: string, payload?: Record<string, any>}

@@ -2,6 +2,7 @@ import { IMeta } from "./IMeta";
 
 export interface IEmitAction {
     name: string,
-    payload: {[key: string]: any},
+    payload?: {[key: string]: any},
+    type?: "flow" | "test", 
     meta?: IMeta
 }

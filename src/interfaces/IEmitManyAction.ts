@@ -1,7 +1,8 @@
 import { IEvent } from "./IEvent";
 import { IMeta } from "./IMeta";
 
-export interface IEmitMany {
+export interface IEmitManyAction {
     events: IEvent[],
+    type: "flow" | "test",
     meta?: IMeta
 }

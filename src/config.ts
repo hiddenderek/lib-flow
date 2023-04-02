@@ -1,6 +1,7 @@
 const config = {
     rabbitMQ: {
         url: 'amqp://rabbitmq:5672',
+        testUrl: 'amqp://localhost:5672',
         exchangeName: 'microserviceExchange'
     },
     opa: {
@@ -11,8 +12,8 @@ const config = {
         token: 'super-secret'
     },
     host: {    
-        port: typeof process != "undefined" ? process?.env?.HTTP_PORT : 8111,
-        hostname: typeof process != "undefined" ? process?.env?.HOSTNAME : 'localhost'
+        port: process.env?.HTTP_PORT ? process.env.HTTP_PORT : 8111,
+        hostname: process.env?.HTTP_PORT ? process.env.HOSTNAME : 'localhost'
     },
 }
 export default config
