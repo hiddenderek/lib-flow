@@ -25,4 +25,5 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run up
+      - run: sleep 10s
       - run: npm run test:integration
