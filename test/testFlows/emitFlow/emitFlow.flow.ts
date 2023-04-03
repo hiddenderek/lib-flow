@@ -38,13 +38,13 @@ export default new Flow({
         additionalProperties: true,
     } as const,
     body: async function*([input, meta]) {
-        const bob = input?.hi ?? 22
+        const bob = 42
         yield 1 + 1
         yield* add(452323, 40232323)
         yield* add(4523323, 40232323)
         yield* add(452323, 40232323)
         yield* add(4523323, 40232323)
         yield emit('emitFlowTrigger', {numbers: bob})
-        return bob
+        return input.hi
     }
 })

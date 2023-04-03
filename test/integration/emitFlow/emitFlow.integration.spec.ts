@@ -13,7 +13,7 @@ describe('emitFlow', () => {
         await flowTestSuite.start({hi: 'hello'})
         const event = await eventTestSuite.waitForEvent('emitFlowTrigger')
         expect(event.name).toEqual('emitFlowTrigger')
-        expect(event.payload).toEqual({numbers: 'hello'})
+        expect(event.payload).toEqual({numbers: 502})
         expect(flowTestSuite.responsePayload).toEqual('hello')
     })
 })
