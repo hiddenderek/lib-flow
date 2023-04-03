@@ -17,7 +17,8 @@
     "up": "docker-compose up -d",
     "down": "docker-compose down -v",
     "deploy:app": "npm run up -- --no-deps --build app",
-    "deploy:policies": "docker-compose rm -sv --force opa && docker-compose up -d opa"
+    "deploy:policies": "docker-compose rm -sv --force opa && docker-compose up -d opa",
+    "deploy:queues": "docker-compose rm -sv --force rabbitmq && docker-compose up -d rabbitmq"
   },
   "repository": {
     "type": "git",

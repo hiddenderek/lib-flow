@@ -3,12 +3,15 @@ import { IClientDetails } from "../interfaces/IClientDetails"
 import config from "../config"
 import { waitForEventAction } from "../flowActions/waitForEvent/waitForEventAction"
 import { emitAction } from "../flowActions/emit/emitAction"
+import { v4 as uuidv4 } from 'uuid';
+import { IMeta } from "src/interfaces/IMeta"
 
 export class EventTestSuiteBuilder  {
-    flowClient : AxiosInstance | undefined
-    flowId: string | undefined
+    flowClient?: AxiosInstance
+    flowId?: string
     baseURL: string
-    responsePayload : Record<string, any> | undefined
+    responsePayload?: Record<string, any>
+    fakeMeta?: IMeta
 
     constructor(flowClient?: AxiosInstance) { 
        this.flowClient = flowClient
@@ -33,17 +36,27 @@ export class EventTestSuiteBuilder  {
                 "Content-Type": "application/json"
             }
         })
+
+
         
         return new EventTestSuiteBuilder(axiosClient)
     }
 
-    public waitForEvent = async (name: string, timeout?: number) => {
-        const {status, data} = await waitForEventAction({name, timeout, type: "test"})
+    public waitForEvent = async (name: string, timeout?: number, requestId?: string) => {
+        const {status, data} = await waitForEventAction({name, timeout, type: "test", meta: this.fakeMeta ?? {requestId} as any})
         return data
     }
 
     public emit = async (name: string, payload?: Record<string, any>) => {
-        const {status, data} = await emitAction({name, payload, type: "test"})
+        const fakeMeta =  {
+            flowId: 'test-flow',
+            requestId: uuidv4(),
+            tenantId: process?.env?.CLIENT_TENANT || 'nelnet',
+            executionId: uuidv4(),
+            startTime: 'fake-time'
+        }
+        this.fakeMeta = fakeMeta
+        const {status, data} = await emitAction({name, payload, type: "test", meta: this.fakeMeta})
         return data
     }
 }

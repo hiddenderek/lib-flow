@@ -20,6 +20,7 @@ export const actionHandler = async (input: IActionHandler) : Promise<{status: nu
         tenantId: input.meta?.tenantId,
         requestId:  input.meta?.requestId,
     }
+    console.log('STARTING ACTION REQUEST ID: ' + flowLog.requestId)
     logMessage(`Starting action '${__flowAction__}' for flow '${input.meta.flowId}'`, flowLog)
     switch (__flowAction__) {
         case 'emit': {

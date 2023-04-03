@@ -2,9 +2,13 @@ import axios, { AxiosInstance } from "axios"
 import { IClientDetails } from "../interfaces/IClientDetails"
 import config from "../config"
 
+
+
+
 export class FlowTestSuiteBuilder  {
     flowClient?: AxiosInstance
     flowId?: string
+    requestId?: string
     baseURL: string
     executionId?: string
     status?: "completed" | "pending" | "failed" 
@@ -45,6 +49,7 @@ export class FlowTestSuiteBuilder  {
             input
         )
         this.executionId = result?.data?.id
+        this.requestId = result?.data?.requestId
         this.status = result?.data?.continuation?.status
         this.responsePayload = result?.data?.continuation?.result || result?.data?.continuation?.command
     }
@@ -55,6 +60,7 @@ export class FlowTestSuiteBuilder  {
             {executionId, resumeWith}
         )
         this.executionId = executionId
+        this.requestId = result?.data?.requestId
         this.status = result?.data?.continuation?.status
         this.responsePayload = result?.data?.continuation?.result || result?.data?.continuation?.command
     }

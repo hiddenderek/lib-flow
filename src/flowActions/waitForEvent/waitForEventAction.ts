@@ -44,7 +44,10 @@ export const waitForEventAction = async (options: IWaitForEventAction) => {
                     // only allow waitForEvents to be successful if the event requestId matches the current one
                     // this is to avoid clutter with other events
                     // dont outright reject though as there could be multiple events from multiple requests being consumed by the waitForEvent
-                    if ((options.meta?.requestId === payload?.requestId) || !flowCheck) {
+                    console.log('FLOW ID META' + options.meta?.requestId)
+                    console.log('REQUEST ID META: '+ options.meta?.requestId)
+                    console.log('REQUEST ID MESSAGE: ' + payload?.requestId)
+                    if (options.meta?.requestId === payload?.requestId) {
                         clearTimeout(timeout)
                         flowCheck ? logMessage(`Consumed event '${options.name}'`, flowLog) : ""
                         resolve({name: payload.logType, payload: payload.data});

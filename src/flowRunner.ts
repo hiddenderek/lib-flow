@@ -22,6 +22,7 @@ export const flowRunner = async <I extends Readonly<JsonSchema>>(schema: JsonSch
         flowId: id,
         flowVersion: 2,
         tenantId,
+        requestId,
         continuation: {
             status: 'pending'
         }
@@ -131,6 +132,7 @@ export const flowRunner = async <I extends Readonly<JsonSchema>>(schema: JsonSch
                 console.log("DONE STATUS: " + curVal.done)
                 console.log("ACTION NAME: " + actionName)
                 console.log("MODE BEFORE ACTION: " + flowMode)
+                console.log('REQUEST ID ACTION' + meta.requestId)
                 const actionResult = await actionHandler({curVal, meta, resumeWith: resumeParams?.resumeWith, flowMode})
                 if (actionResult.status >= 400) {
                     await logError(`Error in action '${actionName}'`, flowLog, JSON.stringify(actionResult.data)) 

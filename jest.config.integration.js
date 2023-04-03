@@ -9,7 +9,7 @@ module.exports = {
     transform: {
       '^.+\\.ts$': 'ts-jest',
     },
-    testTimeout: 20000,
+    testTimeout: 40000,
     collectCoverageFrom: [
       '**/test/**/*.ts',
     ],

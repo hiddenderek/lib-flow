@@ -3,6 +3,7 @@ export interface IFlowSuccess {
     flowId: string, 
     flowVersion: number, 
     tenantId: string, 
+    requestId: string,
     continuation: { 
         command?: Record<string, any>,
         status: 'completed' | 'pending' | 'failed',

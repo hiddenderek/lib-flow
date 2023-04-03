@@ -39,11 +39,9 @@ export const emitAction = async (options: IEmitAction) => {
         tenantId: options.meta?.tenantId,
         requestId:  options.meta?.requestId,
     }
-
+    console.log('EVENT EMITTED WITH REQUEST ID ' + flowLog.requestId)
     logMessage(`Publishing event with name ${options.name} (tracking id: ${trackingId}) to exchange ${exchangeName} with data: ${JSON.stringify(options.payload)}`, flowLog)
-    if (!flowCheck) {
-        await channel.deleteQueue(options.name)
-    }
+
     await channel.close()
     if (!flowCheck) {
         await connection.close()
