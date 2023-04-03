@@ -10,7 +10,7 @@ module.exports = {
       '^.+\\.ts$': 'ts-jest',
     },
     collectCoverageFrom: [
-      '**/src/**/*.ts',
+      '**/test/**/*.ts',
     ],
     coverageThreshold: {
       global: {

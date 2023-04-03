@@ -1,4 +1,3 @@
-export const emitWrapper = (name: string, payload: Record<string, any>) => {
-    console.log('Wrapped!' + name)
+export const emitWrapper = (name: string, payload?: Record<string, any>) => {
     return {__flowAction__: 'emit', name, payload}
 }

@@ -1,0 +1,29 @@
+name: build-branch
+
+on:
+  push:
+    branches:
+      - MS*
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  DOCKER_REGISTRY: nelnet-docker.jfrog.io
+  NPM_REGISTRY: nelnet.jfrog.io/nelnet/api/npm/npm/
+  HUSKY: 0
+
+jobs:
+   build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - run: npm ci
+      - run: npm test
+      - run: npm run up
+      - run: sleep 10s
+      - run: npm run test:integration

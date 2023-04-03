@@ -1,0 +1,13 @@
+FROM node:16
+WORKDIR /app
+COPY package.json .
+COPY .npmrc .
+ARG NODE_ENV
+RUN if [ "$NODE_ENV" = "development" ]; \
+        then npm install && npm install ts-node -g; \
+        else npm install --only=production; \
+        fi
+
+COPY . ./
+EXPOSE 8111
+CMD ["ts-node", "src/flows/flowServer.ts"]
