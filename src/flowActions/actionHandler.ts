@@ -11,11 +11,13 @@ import { IFlowLog } from "../interfaces/IFlowLog";
 import { waitForEventAction } from "./waitForEvent/waitForEventAction";
 import { IWaitForEventAction } from "../interfaces/IWaitForEventAction";
 import { ICallServiceAction } from "../interfaces/ICallServiceAction";
+import { listenForEventAction } from "./listenForEvent/listenForEventAction";
+import { IListenForEventAction } from "../interfaces/IListenForEventAction";
 
 export const actionHandler = async (input: IActionHandler) : Promise<{status: number, data: any}> => {
     const {__flowAction__, ...values} = JSON.parse(JSON.stringify(input.curVal.value)) as IActionHandler['curVal']['value']
     const flowLog : IFlowLog = {
-        id: input.meta.flowId, 
+        id: input.meta?.flowId, 
         executionId: input.meta?.executionId, 
         tenantId: input.meta?.tenantId,
         requestId:  input.meta?.requestId,
@@ -41,6 +43,10 @@ export const actionHandler = async (input: IActionHandler) : Promise<{status: nu
         }
         case 'waitForEvent': {
             const { status, data } = await waitForEventAction({...values, meta: input.meta, type: "flow"} as IWaitForEventAction)
+            return {status, data}
+        }
+        case 'listenForEvent': {
+            const { status, data } = await listenForEventAction({...values, meta: input.meta, type: "flow"} as IListenForEventAction)
             return {status, data}
         }
         default: {

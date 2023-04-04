@@ -92,9 +92,10 @@ export const flowRunner = async <I extends Readonly<JsonSchema>>(schema: JsonSch
         
 
         // Run the body of the flow if all flow checks are successful
-        const meta = {flowId: id, executionId, startTime: new Date().toISOString(), token, requestId, tenantId}
 
         const runTimeId = `${tenantId}.${id}.${executionId}`
+
+        const meta = {flowId: id, executionId, startTime: new Date().toISOString(), token, requestId, tenantId}
 
         // check if there was a cached body instance before setting the body instance  
 
@@ -167,7 +168,8 @@ export const flowRunner = async <I extends Readonly<JsonSchema>>(schema: JsonSch
         flowSuccess.continuation.result = curVal.value
         return { status: curVal.value?.resStatus ? curVal.value.resStatus : 200, flowResult: flowSuccess}
     } catch (e: any) {
-        await logError("Uncaught error in flow", flowLog, JSON.stringify(e)) 
+        console.log(e)
+        await logError("Uncaught error in flow", flowLog, e) 
         flowFailure.message = "Uncaught error in flow"
         flowFailure.name = "BadRequestError"
         flowFailure.code = 500

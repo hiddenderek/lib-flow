@@ -23,7 +23,7 @@ export async function listen<I extends Readonly<JsonSchema>>(bindingKey: string,
     console.info('exchange!')
     await channel.assertExchange(config.rabbitMQ.exchangeName, "direct");
     console.info('queue!')
-    const q = await channel.assertQueue(`${bindingKey}Queue`)
+    const q = await channel.assertQueue(`${bindingKey}.Queue`)
     console.info('binding!')
     await channel.bindQueue(q.queue, config.rabbitMQ.exchangeName, bindingKey)
     console.info('consume!')

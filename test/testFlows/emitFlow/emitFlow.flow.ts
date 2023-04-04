@@ -44,7 +44,7 @@ export default new Flow({
         yield* add(4523323, 40232323)
         yield* add(452323, 40232323)
         yield* add(4523323, 40232323)
-        yield emit('emitFlowTrigger', {numbers: bob})
+        yield emit('emitFlowTrigger', {numbers: bob}, true)
         return input.hi
     }
 })

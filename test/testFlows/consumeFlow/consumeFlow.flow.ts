@@ -37,7 +37,7 @@ export default new Flow({
         bob = yield* add(bob, numbers)
         console.log(bob) 
         }
-        yield emit('consumeFlowTrigger')
+        yield emit('consumeFlowTrigger', undefined, true)
 
         return bob
     }

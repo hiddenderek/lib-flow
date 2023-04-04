@@ -4,7 +4,8 @@ import config from "../config"
 import { waitForEventAction } from "../flowActions/waitForEvent/waitForEventAction"
 import { emitAction } from "../flowActions/emit/emitAction"
 import { v4 as uuidv4 } from 'uuid';
-import { IMeta } from "src/interfaces/IMeta"
+import { IMeta } from "../interfaces/IMeta"
+import { listenForEventAction } from "../flowActions/listenForEvent/listenForEventAction"
 
 export class EventTestSuiteBuilder  {
     flowClient?: AxiosInstance
@@ -41,6 +42,12 @@ export class EventTestSuiteBuilder  {
         
         return new EventTestSuiteBuilder(axiosClient)
     }
+
+    public listenForEvent = async (name: string) => {
+        const {status, data} = await listenForEventAction({name, type: "test"})
+        return data
+    }
+    
 
     public waitForEvent = async (name: string, timeout?: number, requestId?: string) => {
         const {status, data} = await waitForEventAction({name, timeout, type: "test", meta: this.fakeMeta ?? {requestId} as any})

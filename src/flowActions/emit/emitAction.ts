@@ -18,21 +18,40 @@ export const emitAction = async (options: IEmitAction) => {
     const trackingId = uuid()
     await channel.assertExchange(exchangeName, "direct")
 
+    const publishBody = {
+        data: options?.payload,
+        timeStamp: new Date().toISOString(),
+        token: options?.meta?.token,
+        requestId: options?.meta?.requestId,
+        tenantId: options?.meta?.tenantId,
+        trackingId
+    }
+
     await channel.publish(
         exchangeName,
         options.name,
         Buffer.from(
             JSON.stringify({
                 logType: options.name,
-                data: options?.payload,
-                timeStamp: new Date().toISOString(),
-                token: options?.meta?.token,
-                requestId: options?.meta?.requestId,
-                tenantId: options?.meta?.tenantId,
-                trackingId
+                ...publishBody
             })
         )
     )
+    // publish a tracked version of the emit to be potentially consumed by waitForEvent actions, if enabled
+    if (options.tracked) {
+        console.log('emitting tracked event ' + `track.${options.name}` + ', request id: ' + options.meta?.requestId)
+        console.log('TIMESTAMP: ' + new Date().toISOString())
+        await channel.publish(
+            exchangeName,
+            `track.${options.name}`,
+            Buffer.from(
+                JSON.stringify({
+                    logType: `track.${options.name}`,
+                    ...publishBody
+                })
+            )
+        )
+    }
     const flowLog : IFlowLog = {
         id: options.meta?.flowId,
         executionId: options.meta?.executionId, 
@@ -43,9 +62,8 @@ export const emitAction = async (options: IEmitAction) => {
     logMessage(`Publishing event with name ${options.name} (tracking id: ${trackingId}) to exchange ${exchangeName} with data: ${JSON.stringify(options.payload)}`, flowLog)
 
     await channel.close()
-    if (!flowCheck) {
-        await connection.close()
-    }
+    await connection.close()
+    
 
     return {status: 200, data: {}}
 }

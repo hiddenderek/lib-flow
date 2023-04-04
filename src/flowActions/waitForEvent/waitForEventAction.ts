@@ -5,7 +5,10 @@ import { IFlowLog } from "../../interfaces/IFlowLog"
 import { IWaitForEventAction } from "../../interfaces/IWaitForEventAction"
 
 export const waitForEventAction = async (options: IWaitForEventAction) => {
+    // TODO: Fix wait for event action (messages being acknowledged before waitForEvent can consume)
+    const queueName = `track.${options.name}`
     console.info('listen!')
+    console.log('waiting for event : ' + queueName)
     const flowCheck = options.type === "flow"  || options.type === undefined
     let connection : amqp.Connection
     const url = flowCheck ? config.rabbitMQ.url : config.rabbitMQ.testUrl
@@ -16,12 +19,14 @@ export const waitForEventAction = async (options: IWaitForEventAction) => {
         await new Promise(resolve => setTimeout(resolve, 1000));
         connection = await amqp.connect(url)
     }
+    console.log('connected!')
     const channel = await connection.createChannel()
     await channel.assertExchange(config.rabbitMQ.exchangeName, "direct");
-    const q = await channel.assertQueue(`${options.name}${flowCheck ? "WaitForEvent" : "TestWaitForEvent"} Queue`)
-    await channel.bindQueue(q.queue, config.rabbitMQ.exchangeName, options.name)
-    const timeoutDuration = options.timeout ?? 5000
+    const q = await channel.assertQueue(`${queueName}.WaitForEventQueue.${flowCheck ? "flow" : "test"}`)
+    await channel.bindQueue(q.queue, config.rabbitMQ.exchangeName, queueName)
+    const timeoutDuration = options.timeout ?? 7000
     let timeout : NodeJS.Timeout | undefined
+    console.log('waiting for consume!')
     const message : any = await new Promise((resolve, reject) => {
         const flowLog : IFlowLog = {
             id: options.meta?.flowId,
@@ -29,17 +34,18 @@ export const waitForEventAction = async (options: IWaitForEventAction) => {
             tenantId: options.meta?.tenantId,
             requestId:  options.meta?.requestId,
         }
-        flowCheck ? logMessage(`Waiting for event '${options.name}'`, flowLog) : "";
+        logMessage(`Waiting for event '${queueName}'`, flowLog)
 
         timeout = setTimeout(async () => {
-            await channel.deleteQueue(options.name)
+            await channel.deleteQueue(queueName)
             await channel.close()
             await connection.close()
-            reject(new Error (`timed out waiting for event '${options.name}' in ${timeoutDuration}ms`))
+            reject(new Error (`timed out waiting for event '${queueName}' in ${timeoutDuration}ms`))
         }, timeoutDuration)
 
         channel.consume(q.queue, async (msg) => {
                 if (msg) {
+                    console.log('CONSUMING!')
                     const payload =JSON.parse(msg.content.toString())
                     // only allow waitForEvents to be successful if the event requestId matches the current one
                     // this is to avoid clutter with other events
@@ -49,16 +55,15 @@ export const waitForEventAction = async (options: IWaitForEventAction) => {
                     console.log('REQUEST ID MESSAGE: ' + payload?.requestId)
                     if (options.meta?.requestId === payload?.requestId) {
                         clearTimeout(timeout)
-                        flowCheck ? logMessage(`Consumed event '${options.name}'`, flowLog) : ""
+                        logMessage(`Consumed event '${queueName}'`, flowLog)
+                        channel.ack(msg)
                         resolve({name: payload.logType, payload: payload.data});
                     } 
                 }
             }
         )
     }) 
-
-    // dont acknowledge message as this is just a check to make sure it was emitted
-    await channel.deleteQueue(options.name)
+    await channel.deleteQueue(queueName)
     await channel.close()
     await connection.close()
     clearTimeout(timeout)
