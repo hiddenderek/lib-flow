@@ -31,7 +31,7 @@ export class FlowTestSuiteBuilder  {
         //         }
         //     }
         // )
-        console.log(this.baseURL)
+
         const axiosClient = axios.create({
             baseURL: this.baseURL,
             headers: {
@@ -54,7 +54,6 @@ export class FlowTestSuiteBuilder  {
         this.responsePayload = result?.data?.continuation?.result || result?.data?.continuation?.command
     }
     public resume = async (executionId: string, resumeWith: Record<string, any>) => {
-        console.log(`PATH: v${config.flow.version}/flow/resume/${this.flowId}`)
         const result = await this.flowClient?.post(
             `v${config.flow.version}/flow/resume/${this.flowId}`,
             {executionId, resumeWith}

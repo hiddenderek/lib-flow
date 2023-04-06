@@ -5,5 +5,6 @@ export interface IMeta {
     tenantId?: string,
     startTime: string,
     runTime?: string,
-    token?: string
+    token?: string,
+    flowMode?: string
 }

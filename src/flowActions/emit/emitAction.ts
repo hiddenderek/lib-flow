@@ -3,20 +3,25 @@ import amqp from 'amqplib';
 import { v4 as uuid } from 'uuid';
 import { logMessage } from "../../logging/logMessage";
 import { IEmitAction } from "../../interfaces/IEmitAction";
-import { IFlowLog } from "../../interfaces/IFlowLog";
+import { IFlowInfo } from "../../interfaces/IFlowInfo";
 
 export const emitAction = async (options: IEmitAction) => {
-    console.log(options.type)
     const flowCheck = options.type === "flow" || options.type === undefined
-    console.log(flowCheck)
-    console.log( config.rabbitMQ.url) 
     const url = flowCheck ? config.rabbitMQ.url : config.rabbitMQ.testUrl
-    console.log(url)
     const connection = await amqp.connect(url)
     const channel = await connection.createChannel()
     const exchangeName = config.rabbitMQ.exchangeName
     const trackingId = uuid()
     await channel.assertExchange(exchangeName, "direct")
+
+    const flowInfo : IFlowInfo = {
+        id: options.meta?.flowId,
+        executionId: options.meta?.executionId, 
+        tenantId: options.meta?.tenantId,
+        requestId:  options.meta?.requestId,
+        token: options.meta?.token,
+        flowMode: options.meta?.flowMode
+    }
 
     const publishBody = {
         data: options?.payload,
@@ -24,7 +29,6 @@ export const emitAction = async (options: IEmitAction) => {
         token: options?.meta?.token,
         requestId: options?.meta?.requestId,
         tenantId: options?.meta?.tenantId,
-        trackingId
     }
 
     await channel.publish(
@@ -33,33 +37,32 @@ export const emitAction = async (options: IEmitAction) => {
         Buffer.from(
             JSON.stringify({
                 logType: options.name,
-                ...publishBody
+                ...publishBody,
+                trackingId
             })
         )
     )
+
+    logMessage(`Publishing event with name ${options.name} (tracking id: ${trackingId}) to exchange ${exchangeName} with data: ${JSON.stringify(publishBody.data)}`, flowInfo)
+
     // publish a tracked version of the emit to be potentially consumed by waitForEvent actions, if enabled
     if (options.tracked) {
-        console.log('emitting tracked event ' + `track.${options.name}` + ', request id: ' + options.meta?.requestId)
-        console.log('TIMESTAMP: ' + new Date().toISOString())
+        const trackingId2 = uuid()
+
         await channel.publish(
             exchangeName,
             `track.${options.name}`,
             Buffer.from(
                 JSON.stringify({
                     logType: `track.${options.name}`,
-                    ...publishBody
+                    ...publishBody,
+                    trackingId2
                 })
             )
         )
+        logMessage(`Publishing tracked event with name track.${options.name} (tracking id: ${trackingId2}) to exchange ${exchangeName} with data: ${JSON.stringify(publishBody.data)}`, flowInfo)
     }
-    const flowLog : IFlowLog = {
-        id: options.meta?.flowId,
-        executionId: options.meta?.executionId, 
-        tenantId: options.meta?.tenantId,
-        requestId:  options.meta?.requestId,
-    }
-    console.log('EVENT EMITTED WITH REQUEST ID ' + flowLog.requestId)
-    logMessage(`Publishing event with name ${options.name} (tracking id: ${trackingId}) to exchange ${exchangeName} with data: ${JSON.stringify(options.payload)}`, flowLog)
+
 
     await channel.close()
     await connection.close()

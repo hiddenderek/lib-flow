@@ -38,7 +38,6 @@ export default new Flow({
         console.log(bob) 
         }
         yield emit('consumeFlowTrigger', undefined, true)
-
         return bob
     }
 })

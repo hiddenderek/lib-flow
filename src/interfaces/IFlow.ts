@@ -11,7 +11,7 @@ export interface IFlow<I extends Readonly<JsonSchema>> {
     triggers?: {events?: string[], schedules?: string[]},
     method?: AllowedRequests,
     input: I,
-    body: ([input, meta]: [JsonSchemaToObject<I>, IMeta], ) => AsyncGenerator<any, any>
+    body: ([input, meta]: [JsonSchemaToObject<I>, IMeta], ) => AsyncGenerator<any, any, any>
 }
 
 

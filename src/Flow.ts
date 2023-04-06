@@ -11,9 +11,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { logMessage } from "./logging/logMessage";
 import LRUCache from "lru-cache";
 import { envVarToNumber } from "./utils/envVarToNumber";
-import { IFlowFailure } from "./interfaces/IFlowFailure";
 import { logError } from "./logging/logError";
-import { IFlowLog } from "./interfaces/IFlowLog";
+import { IFlowInfo } from "./interfaces/IFlowInfo";
+import { BadRequestError } from "./errors/BadRequestError";
 interface Flow<I> extends IFlow<I> {}
 
 class Flow<I extends Readonly<JsonSchema>> {
@@ -27,13 +27,22 @@ class Flow<I extends Readonly<JsonSchema>> {
         this.method = content?.method
         if (content?.triggers?.events) {
             content.triggers.events.forEach((event) => {
-                listen<typeof content.input>(event, this.input, this.body, this.id, 'queue', this.stateless, this.cache )
+                try {
+                    listen<typeof content.input>(event, this.input, this.body, this.id, 'queue', this.stateless, this.cache )
+                } catch (e) {
+                    const flowInfo : IFlowInfo = {
+                        id:  this.id, 
+                        stateless: this.stateless, 
+                        executionSource: 'queue', 
+                    }
+                    logError(`Uncaught error consuming event '${this.id}'`, flowInfo, JSON.stringify(e))
+                }
             })
         }
         if (content?.triggers?.schedules) {
             content.triggers.schedules.forEach((schedule) => {
                 const tenantId = process?.env?.CLIENT_TENANT || 'nelnet'
-                const flowLog : IFlowLog = {
+                const flowInfo : IFlowInfo = {
                     id:  this.id, 
                     stateless: this.stateless, 
                     executionSource: 'cron', 
@@ -44,11 +53,11 @@ class Flow<I extends Readonly<JsonSchema>> {
                     cron.schedule(schedule, async () => {
                         const {access_token}  = await getToken('exchange')
                         const requestId = uuidv4() 
-                        logMessage(`Running scheduled job for flow '${this.id}'`, flowLog)
+                        logMessage(`Running scheduled job for flow '${this.id}'`, flowInfo)
                         await flowRunner(this.input, {} as any, this.body, this.id, 'cron', this.stateless, access_token, requestId, tenantId, this.cache)
                     })
                 } else {
-                    logError(`Invalid Cron Schedule '${schedule}'. Skipping.`, flowLog)
+                    logError(`Invalid Cron Schedule '${schedule}'. Skipping.`, flowInfo)
                 }
             })
         }
@@ -113,15 +122,12 @@ class Flow<I extends Readonly<JsonSchema>> {
                 res.status(result.status)
                 res.json(result.flowResult)
             } else {
-                const flowFailure : IFlowFailure = {
-                    requestID : requestId,
-                    message: 'execution id not provided',
-                    data: {},
-                    name: "BadRequestError",
-                    code: 404
-                }
+                const message = "Execution id not provided"
+                const status = 422
+                const error = new BadRequestError(message, status, requestId)
+                await logError(message, {id: this.id, executionId, tenantId, requestId, token, executionSource: "request"})
                 res.status(404)
-                res.json(flowFailure)
+                res.json(error)
             }
         })  
     }

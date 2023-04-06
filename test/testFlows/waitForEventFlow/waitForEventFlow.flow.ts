@@ -21,7 +21,7 @@ export default new Flow({
         yield listenForEvent('emitFlowTrigger')
         yield emit('waitForEventFlowTrigger', undefined, true)
         yield* add(20, 50)
-        const result = (yield waitForEvent('emitFlowTrigger')) as { name: string}
+        const result = yield waitForEvent('emitFlowTrigger')
         yield* add(20, 50)
         console.log(result)
         return result.name

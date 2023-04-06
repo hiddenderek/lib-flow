@@ -1,6 +1,8 @@
-import { IFlowLog } from "../interfaces/IFlowLog"
+import { decorateLog } from "./decorateLog"
+import { IFlowInfo } from "../interfaces/IFlowInfo"
 
-export const logMessage = (message: string, flowLog: IFlowLog) => {
-    console.info(message)
+export const logMessage = (message: string, flowLog: IFlowInfo) => {
+    decorateLog(flowLog, "Flow Runtime")
+    console.log(message)
 }
 
