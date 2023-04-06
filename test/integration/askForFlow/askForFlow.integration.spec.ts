@@ -9,7 +9,7 @@ describe('askForFlow', () => {
         eventTestSuite = await EventTestSuite.init(CLIENT_DETAILS['test-runner'])
     })
 
-    it('should emit an event', async () => {
+    it('should execute two askFor requests and emit 2 events', async () => {
         await flowTestSuite.start({numbers: 234})
         expect(flowTestSuite.status).toEqual("pending")
         await eventTestSuite.listenForEvent('testEvent1')

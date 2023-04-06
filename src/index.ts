@@ -22,9 +22,9 @@ export const waitForEvent = waitForEventWrapper
 
 export const listenForEvent = listenForEventWrapper
 
-export const importFlows = flowImport
-
 export const FlowError = FlowErrorWrapper
+
+export const importFlows = flowImport
 
 export const FlowTestSuite = new FlowTestSuiteBuilder()
 

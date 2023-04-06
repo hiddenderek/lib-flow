@@ -19,6 +19,9 @@ export class FlowTestSuiteBuilder  {
        this.flowId = flowId
        this.baseURL = process.env.API_GATEWAY_URL || `http://${config.host.hostname}:${config.host.port}`
     }
+
+    private tenantId = process?.env?.CLIENT_TENANT || 'nelnet'
+
     public init = async (clientDetails: IClientDetails, flowId: string) : Promise<FlowTestSuiteBuilder>=> {
         // TODO: disable this placeholder-token and research authentication further
         const token = "placeholder-token"
@@ -45,7 +48,7 @@ export class FlowTestSuiteBuilder  {
 
     public start = async (input: Record<string, any>) => {
         const result = await this.flowClient?.post(
-            `v${config.flow.version}/flow/start/${this.flowId}`,
+            `v${config.flow.version}/flow/start/${this.tenantId}/${this.flowId}`,
             input
         )
         this.executionId = result?.data?.id
@@ -55,7 +58,7 @@ export class FlowTestSuiteBuilder  {
     }
     public resume = async (executionId: string, resumeWith: Record<string, any>) => {
         const result = await this.flowClient?.post(
-            `v${config.flow.version}/flow/resume/${this.flowId}`,
+            `v${config.flow.version}/flow/resume/${this.tenantId}/${this.flowId}`,
             {executionId, resumeWith}
         )
         this.executionId = executionId

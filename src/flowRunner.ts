@@ -121,41 +121,41 @@ export const flowRunner = async <I extends Readonly<JsonSchema>>(schema: JsonSch
 
             decorateLog(flowInfo, "Flow Output")
             try {
-            while(curVal?.done === false) {
-                const cloneInstance = bodyInstance.clone()
-                cache.set(runTimeId, cloneInstance)
-                curVal = await bodyInstance.next(curVal.value)
-                const actionName = curVal?.value?.__flowAction__
-                // Make sure done is not true before executing an action. 
-                // This is due to the potential to return an actions wrapper value at the end of a function,
-                // Which contains the action name, and could trick the flow into 
-                // thinking theres one last action to run when there is not
-                if (actionName && curVal?.done !== true) {
-                    const actionResult = await actionHandler({curVal, meta, resumeWith: resumeParams?.resumeWith, flowMode})
-                    if (actionResult.status >= 400) {
-                        const message = `Error in action '${actionName}'`
-                        const status = actionResult.status
-                        await logError(message, flowInfo, JSON.stringify(actionResult.data)) 
-                        const error = new FlowCommandFailedError(message, status, requestId, actionResult.data)
-                        return {status: status, flowResult: error}
-                    } else if (actionResult.status === 202) {
-                        flowSuccess.continuation.result = undefined
-                        flowSuccess.continuation.status = "pending"
-                        flowSuccess.continuation.command = { type: actionName, data: actionResult.data }
-                        return { status: 202, flowResult: flowSuccess}
+                while(curVal?.done === false) {
+                    const cloneInstance = bodyInstance.clone()
+                    cache.set(runTimeId, cloneInstance)
+                    curVal = await bodyInstance.next(curVal.value)
+                    const actionName = curVal?.value?.__flowAction__
+                    // Make sure done is not true before executing an action. 
+                    // This is due to the potential to return an actions wrapper value at the end of a function,
+                    // Which contains the action name, and could trick the flow into 
+                    // thinking theres one last action to run when there is not
+                    if (actionName && curVal?.done !== true) {
+                        const actionResult = await actionHandler({curVal, meta, resumeWith: resumeParams?.resumeWith, flowMode})
+                        if (actionResult.status >= 400) {
+                            const message = `Error in action '${actionName}'`
+                            const status = actionResult.status
+                            await logError(message, flowInfo, JSON.stringify(actionResult.data)) 
+                            const error = new FlowCommandFailedError(message, status, requestId, actionResult.data)
+                            return {status: status, flowResult: error}
+                        } else if (actionResult.status === 202) {
+                            flowSuccess.continuation.result = undefined
+                            flowSuccess.continuation.status = "pending"
+                            flowSuccess.continuation.command = { type: actionName, data: actionResult.data }
+                            return { status: 202, flowResult: flowSuccess}
+                        }
+                        logMessage(`Action '${actionName}' for flow '${id}' completed successfully`, flowInfo)
                     }
-                    logMessage(`Action '${actionName}' for flow '${id}' completed successfully`, flowInfo)
-                }
-                // Resume mode only lasts for the first askFor flow action after a resume, then it reverts back to 'start' mode. 
-                // This is to allow multiple resume requests in the same flow
-                // if it was not reverted then the flow would not switch to pending again
-                flowMode = "start"
+                    // Resume mode only lasts for the first askFor flow action after a resume, then it reverts back to 'start' mode. 
+                    // This is to allow multiple resume requests in the same flow
+                    // if it was not reverted then the flow would not switch to pending again
+                    flowMode = "start"
                 }
             } catch (e: any) {
                 const message = "Uncaught error in flow"
                 const status = 500
                 await logError(message, flowInfo, e, "Flow Output") 
-                const error = new BadRequestError(message, status, requestId, e)
+                const error = new BadRequestError(message, status, requestId, {...e, message: e.message})
                 return {status: status, flowResult: error}
             }
 

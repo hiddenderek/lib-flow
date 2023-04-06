@@ -1,4 +1,4 @@
-import {FlowTestSuite, EventTestSuite} from '../../../src/index'
+import {EventTestSuite} from '../../../src/index'
 import { CLIENT_DETAILS } from '../../utils/auth'
 
 describe('emitFlow', () => {
@@ -7,7 +7,7 @@ describe('emitFlow', () => {
         eventTestSuite = await EventTestSuite.init(CLIENT_DETAILS['test-runner'])
     })
 
-    it('should emit an event', async () => {
+    it('should consume an event', async () => {
         await eventTestSuite.listenForEvent('consumeFlowTrigger')
         await eventTestSuite.emit('emitFlowTrigger', {numbers: 502})
         const event = await eventTestSuite.waitForEvent('consumeFlowTrigger')

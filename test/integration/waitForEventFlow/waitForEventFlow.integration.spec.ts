@@ -9,7 +9,7 @@ describe('waitForEventflow', () => {
         eventTestSuite = await EventTestSuite.init(CLIENT_DETAILS['test-runner'])
     })
 
-    it('should emit an event', async () => {
+    it('should wait for an event', async () => {
         await flowTestSuite.start({helloProp: 'hello'})
         expect(flowTestSuite.responsePayload).toEqual('emitFlowTrigger')
     })

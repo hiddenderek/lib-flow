@@ -19,7 +19,7 @@ export class FlowErrorWrapper extends BaseFlowError {
                 "FlowError",
                 500,
                 meta?.requestId,
-                additionalData ?? {}
+                additionalData
             )
         } else if (typeof data === "object") {
             super(
@@ -28,7 +28,7 @@ export class FlowErrorWrapper extends BaseFlowError {
                 "FlowError",
                 500,
                 meta?.requestId,
-                additionalData ?? {}
+                additionalData
             )            
         }
     }

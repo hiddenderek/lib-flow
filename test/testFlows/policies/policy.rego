@@ -9,7 +9,8 @@ publicFlows = [
   "scheduleFlow",
   "consumeFlow",
   "emitFlow",
-  "askForFlow"
+  "askForFlow",
+  "errorFlow"
 ]
 
 allow {

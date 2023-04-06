@@ -5,5 +5,6 @@ export interface IFlowFailure {
     message: string, 
     data?: Record<string, any>,
     name: error,
-    code: number
+    code: number,
+    stack?: any
 }

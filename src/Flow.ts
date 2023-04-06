@@ -70,17 +70,18 @@ class Flow<I extends Readonly<JsonSchema>> {
         ttl: envVarToNumber(process?.env?.FLOW_RUNTIME_CACHE_TTL, 86_400_000), // 1 day
     })
 
+    private tenantId = process?.env?.CLIENT_TENANT || 'nelnet'
+
     public makeRoute = () => {
         // @ts-ignore
         this.router.use(function timeLog(req , res, next) {
             next();
         });
 
-        this.router[this.method ? this.method : 'post'](`/v${config.flow.version}/flow/start/${this.id}`, async(req: any, res: any) => {
+        this.router[this.method ? this.method : 'post'](`/v${config.flow.version}/flow/start/${this.tenantId}/${this.id}`, async(req: any, res: any) => {
             const authenticateToken = req.headers['authorization'] || ''
             const token = parseToken(authenticateToken) || ''
             const requestId = uuidv4()
-            const tenantId = process?.env?.CLIENT_TENANT || 'nelnet'
             const result = await flowRunner(
                 this.input, 
                 req.body, 
@@ -90,18 +91,17 @@ class Flow<I extends Readonly<JsonSchema>> {
                 this.stateless, 
                 token, 
                 requestId, 
-                tenantId, 
+                this.tenantId, 
                 this.cache, 
                 "start")
             res.status(result.status)
             res.json(result.flowResult)
         }) 
 
-        this.router[this.method ? this.method : 'post'](`/v${config.flow.version}/flow/resume/${this.id}`, async(req: any, res: any) => {
+        this.router[this.method ? this.method : 'post'](`/v${config.flow.version}/flow/resume/${this.tenantId}/${this.id}`, async(req: any, res: any) => {
             const authenticateToken = req.headers['authorization'] || ''
             const token = parseToken(authenticateToken) || ''
             const requestId = uuidv4()
-            const tenantId = process?.env?.CLIENT_TENANT || 'nelnet'
             const executionId = req?.body?.executionId
             const resumeWith = req?.body?.resumeWith
             if (executionId) {
@@ -114,7 +114,7 @@ class Flow<I extends Readonly<JsonSchema>> {
                     this.stateless, 
                     token, 
                     requestId, 
-                    tenantId, 
+                    this.tenantId, 
                     this.cache, 
                     "resume", 
                     {executionId, resumeWith}
@@ -125,7 +125,7 @@ class Flow<I extends Readonly<JsonSchema>> {
                 const message = "Execution id not provided"
                 const status = 422
                 const error = new BadRequestError(message, status, requestId)
-                await logError(message, {id: this.id, executionId, tenantId, requestId, token, executionSource: "request"})
+                await logError(message, {id: this.id, executionId, tenantId: this.tenantId, requestId, token, executionSource: "request"})
                 res.status(404)
                 res.json(error)
             }

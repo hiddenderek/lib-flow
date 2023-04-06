@@ -1,5 +1,4 @@
 import {FlowTestSuite, EventTestSuite} from '../../../src/index'
-import { IMeta } from '../../../src/interfaces/IMeta'
 import { CLIENT_DETAILS } from '../../utils/auth'
 
 describe('emitFlow', () => {
