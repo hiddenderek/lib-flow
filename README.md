@@ -52,7 +52,7 @@ export default new Flow({
 
 Note how flows now contain async generator functions which allow for both yield and await functionality. 
 
-As a result, all of the tools described below are optional and you are free to use whatever functionality you like!
+As a result, all of the tools described in this documentation are optional and you are free to use /create whatever functionality you like!
 
 You will notice that flows are a class that is instantiated with multiple different properties. These are all the possiple properties and their types:
 
