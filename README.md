@@ -439,6 +439,121 @@ Returns the event name and payload
         const result = yield waitForEvent('emitFlowTrigger')
         console.log(result.name, result.payload)
 ```
+## Error handling
+
+You can throw an error within the body of a flow using FlowError
+
+```typescript
+        throw new FlowError('Something happened! Oh no!')
+```
+
+This will stop the execution of a flow result in the response value structure being like so:
+
+```typescript
+export interface IFlowFailure {
+    requestID?: string, 
+    message: string, 
+    data?: Record<string, any>,
+    name: error,
+    code: number,
+    stack?: any
+}
+```
+
+Here is an example of how the response value would look after a flowError:
+
+```typescript
+    it('should fail at flow error', async () => {
+        try {
+        await flowTestSuite.start({schemaToFail: ['hello']})
+        } catch (e: any) {
+            expect(e.response.data).toEqual(
+                {
+                    name: "BadRequestError",
+                    code: 500,
+                    requestID: expect.any(String),
+                    data: {
+                        code: 500,
+                        message: "Something happened! Oh no!",
+                        name: 'FlowError'
+                    },
+                   
+                }
+            )
+        }
+    })
+```
+
+## Logging
+
+Flows come with in depth logging out of the box to ease your debugging experience. All the meta and environment information gets attached to each log to give you as much information as possible.
+
+Here is an example of a flow log:
+
+```
+app_1       | {"mod":"Flow Runtime","flow":{},"msg":"Publishing event with name flow.scheduleFlow.completed (tracking id: f1e8c537-dfd9-411b-b15f-dad27ad0c147) to exchange microserviceExchange with data: {\"flowId\":\"scheduleFlow\",\"executionId\":\"caff248a-65b0-421b-a39a-3658934ffe6d\",\"requestId\":\"656b2f1b-7863-4c03-a148-9c05ad7c434a\",\"stateless\":true}","usr":{"tenant":{}},"http":{"request_start_time":"2023-04-09T15:43:00.120Z","action":{"name":"v0.flow.start"}}}
+```
+
+Flow logs contain the following structure:
+
+```typescript
+export interface IFlowLog {
+    mod: "Flow Output" | "Flow Runtime",
+    flow: {
+        id?: string, 
+        executionId?: string, 
+        executionSource?: executionSource, 
+    },
+    msg: string,
+    error?: string,
+    usr: {
+        tenant: {id?: string},
+    },
+    token_id?: string,
+    http: {
+        requestId?: string,
+        request_start_time: string,
+        action: {
+            name: string
+        } | {}
+    }
+}
+```
+
+### `mod`
+
+Informs you about the context of where the message originated. 'Flow Runtime' means outside the flow body (validation, authentication, unknown errors, etc.). 'Flow Output' means inside the flow body (flow actions, console logs, errors)
+
+### `flow`
+
+Information about the flow itself.
+
+### `msg`
+
+The message sent with the log.
+
+### `error`
+
+Any errors associated with the message
+
+### `usr`
+
+The user information, currently only includes the tenantId
+
+### `token_id`
+
+The token associated with the request, if any.
+
+### `http`
+
+Request information if the flow was triggered by a request. Includes requestId , start time,  and the associated action ('flow.start'/'flow.resume')
+
+
+If you use console.log, console.info, or console.error inside the flow body, it will output the provided message under the 'msg' field and change the 'mod' value to 'Flow Output' to signify it came from inside the flow body.
+
+```
+app_1       | {"mod":"Flow Output","flow":{"id":"urlParamFlow/:testParam","executionId":"c29cb9b7-c351-4d4d-bd2f-46ea2ebc44fe","executionSource":"request"},"msg":{"testParam":"testValue"},"usr":{"tenant":{"id":"nelnet"}},"token_id":"placeholder-token","http":{"requestId":"2214d2e9-9b84-4fa6-b65a-2277ef80b210","request_start_time":"2023-04-09T16:04:32.924Z","action":{"name":"v0.flow.start"}}} 
+```
 
 ## Setting up flows
 
