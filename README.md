@@ -146,7 +146,7 @@ Currently supports:
 
 - cron jobs (using cron syntax, see https://www.npmjs.com/package/cron for more details)
 
-- AMQP messages 
+- AMQP messages / events
 
 Here is an example of a flow triggered by a cron job every minute:
 
@@ -168,7 +168,7 @@ export default new Flow({
 
 As you can see, the cron job will be passed in under the 'schedules' property of the triggers. It is an array of strings, so you can pass in multiple cron job schedules at once for one flow if desired.
 
-Here is an example of a flow triggered by an AMQP message
+Here is an example of a flow triggered by an AMQP message / event
 
 ```typescript
 export default new Flow({
