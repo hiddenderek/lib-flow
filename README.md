@@ -1,6 +1,6 @@
 # microservice-lib-flow
 
-This flow library provides a back end suite of tools compiled together into one easy-to-use light weight package for your convenience. This includes (but is not limited to) full functionality REST API endpoints, built in AMQP producers/consumers (and ways to track messages), scheduled CRON jobs, rego policy validation, in depth logging, and a test suite.
+This flow library provides a back end suite of tools compiled together into one easy-to-use light weight package for your convenience. This includes (but is not limited to) full functionality REST API endpoints, built in AMQP producers/consumers (and ways to track messages) for event driven architecture, scheduled CRON jobs, rego policy validation, in depth logging, and a test suite.
 
 ## How do flows work?
 
