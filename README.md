@@ -198,7 +198,9 @@ export default new Flow({
     }
 })
 ```
-When you create a new flow, a direct exchange will be automatically set up. All flows for this tenant will share this exchange. The values specified in the events array property are binding keys. For each binding key specified, a queue will be automatically created. This queue will listen for messages / events sent to the binding key and run your code if a message is sent to that binding key.
+When you create a new flow, a direct exchange will be automatically set up. All flows for this tenant will share this exchange. The values specified in the events array property are binding keys. For each binding key specified, a message queue will be automatically created. The exchange will send a message with a matching binding key to the relevant queue. 
+
+This effectively creates the ability for event driven architecture managed by queues.
 
 ### `input`
 
