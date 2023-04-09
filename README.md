@@ -474,7 +474,7 @@ You will need a rabbitmq and opa container in your docker compose file, along wi
       - 5672:5672
       - 15672:15672
   opa:
-    image: openpolicyagent/opa:0.29.4
+    image: openpolicyagent/opa:0.51.0
     restart: on-failure
     volumes:
       - ./src/flows/policies/:/data
@@ -493,7 +493,7 @@ You will need a rabbitmq and opa container in your docker compose file, along wi
     - .env
     restart: always
     depends_on:
-      - postgres
+      - opa
       - rabbitmq
     volumes:
       - ./src:/app/src
@@ -586,7 +586,9 @@ docker-compose.yaml
 Dockerfile_app
 ```
 
-After you added your flows, you can set up your rego policy files and then you should just have to run your docker compose file and be good to go!
+After you added your flows, you will need to set up your rego policy files.
+
+After this, and then you should just have to run up your docker compose file.
 
 ## Flow Test Suite
 
