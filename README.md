@@ -124,6 +124,8 @@ allow {
 }
 ```
 
+This regex is essentially ignoring anything in the parameter as it has an unknown value.
+
 ### `method`
 
 The type of method you will be using for your endpoint. Currently supports GET, POST, PUT, PATCH, and DELETE.
