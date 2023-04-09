@@ -37,7 +37,7 @@ services:
       - 5672:5672
       - 15672:15672
   opa:
-    image: openpolicyagent/opa:0.29.4
+    image: openpolicyagent/opa:0.51.0
     restart: on-failure
     volumes:
       - ./test/testFlows/policies/:/data

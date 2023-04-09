@@ -93,7 +93,10 @@ class Flow<I extends Readonly<JsonSchema>> {
                 requestId, 
                 this.tenantId, 
                 this.cache, 
-                "start")
+                "start",
+                undefined,
+                {reqParams: req.params, reqQuery: req.query}
+                )
             res.status(result.status)
             res.json(result.flowResult)
         }) 
@@ -117,7 +120,8 @@ class Flow<I extends Readonly<JsonSchema>> {
                     this.tenantId, 
                     this.cache, 
                     "resume", 
-                    {executionId, resumeWith}
+                    {executionId, resumeWith},
+                    {reqParams: req.params, reqQuery: req.query}
                 )
                 res.status(result.status)
                 res.json(result.flowResult)

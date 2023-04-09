@@ -31,7 +31,7 @@ export const askForAction = async(options: IAskForAction) : Promise<{status: num
             options.curVal.done = false
             return {status: 200, data: {}}
         } else {
-            return {status: 422, data: schemaResult.validate.errors}
+            return {status: 422, data: schemaResult.validate?.errors}
         }
     } else {
         logMessage(`Flow '${options.meta?.flowId}' has no resumeWith input for an 'askFor' action`, flowInfo)   

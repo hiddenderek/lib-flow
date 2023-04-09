@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from "axios"
 import { IClientDetails } from "../interfaces/IClientDetails"
 import config from "../config"
+import { AllowedRequests } from "../types/allowedRequests"
 
 
 
@@ -46,8 +47,8 @@ export class FlowTestSuiteBuilder  {
         return new FlowTestSuiteBuilder(axiosClient, flowId)
     }
 
-    public start = async (input: Record<string, any>) => {
-        const result = await this.flowClient?.post(
+    public start = async (input?: Record<string, any>, method?: AllowedRequests) => {
+        const result = await this.flowClient![method ?? "post"](
             `v${config.flow.version}/flow/start/${this.tenantId}/${this.flowId}`,
             input
         )

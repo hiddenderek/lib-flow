@@ -10,9 +10,10 @@ publicFlows = [
   "consumeFlow",
   "emitFlow",
   "askForFlow",
-  "errorFlow"
+  "errorFlow",
+  "urlParamFlow/:testParam"
 ]
 
 allow {
-  publicFlows[_] == input.request.params.flowId
+    regex.match(concat("", ["^", regex.replace( publicFlows[_], "/:[^/]+", "/[^/]+"), "$"]), input.request.params.flowId)
 }

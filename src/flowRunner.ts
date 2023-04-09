@@ -19,8 +19,9 @@ import { UnauthorizedError } from './errors/UnauthorizedError';
 import { BadRequestError } from './errors/BadRequestError';
 import { NotFoundError } from './errors/NotFoundError';
 import { FlowCommandFailedError } from './errors/FlowCommandFailedError';
+import { IMeta } from './interfaces/IMeta';
 
-export const flowRunner = async <I extends Readonly<JsonSchema>>(schema: JsonSchema , input: JsonSchemaToObject<I>, body: IFlow<I>['body'], id: string, executionSource: 'request' | 'queue' | 'cron', stateless: boolean, token: string, requestId: string, tenantId: string, cache: LRUCache<{}, {}, unknown>, flowMode?: 'start' | 'resume', resumeParams?: any): Promise<{ status: number, flowResult: IFlowSuccess | IFlowFailure}> => {
+export const flowRunner = async <I extends Readonly<JsonSchema>>(schema: JsonSchema , input: JsonSchemaToObject<I>, body: IFlow<I>['body'], id: string, executionSource: 'request' | 'queue' | 'cron', stateless: boolean, token: string, requestId: string, tenantId: string, cache: LRUCache<{}, {}, unknown>, flowMode?: 'start' | 'resume', resumeParams?: Record<string, any>, request?:  Record<string, any>): Promise<{ status: number, flowResult: IFlowSuccess | IFlowFailure}> => {
     const executionId = resumeParams?.executionId ? resumeParams.executionId : uuidv4() 
     const flowInfo : IFlowInfo = {
         id, 
@@ -92,7 +93,17 @@ export const flowRunner = async <I extends Readonly<JsonSchema>>(schema: JsonSch
 
             const runTimeId = `${tenantId}.${id}.${executionId}`
 
-            const meta = {flowId: id, executionId, startTime: new Date().toISOString(), token, requestId, tenantId}
+            const meta : IMeta = {
+                flowId: id, 
+                executionId, 
+                requestId, 
+                tenantId,
+                startTime: new Date().toISOString(), 
+                token, 
+                flowMode,
+                reqParams : request?.reqParams,
+                reqQuery : request?.reqQuery
+            }
 
             // check if there was a cached body instance before setting the body instance  
 

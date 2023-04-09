@@ -21,4 +21,4 @@ export type JsonSchemaToObject<T> =
         ? { [key: string]: any }
         : {}
     )
-    : never;
+    : never

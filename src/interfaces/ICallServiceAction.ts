@@ -4,6 +4,6 @@ import { IMeta } from "./IMeta";
 export interface ICallServiceAction {
     name: string, 
     params: {}, 
-    method: AllowedRequests,
+    method?: AllowedRequests,
     meta: IMeta
 }
