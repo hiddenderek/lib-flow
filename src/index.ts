@@ -4,9 +4,11 @@ import { emitWrapper } from "./flowActions/emit/emitWrapper"
 import { flowImport } from "./flowImport"
 import { askForWrapper } from "./flowActions/askFor/askForWrapper"
 import { callServiceWrapper } from "./flowActions/callService/callServiceWrapper"
+import { FlowErrorWrapper } from "./errors/FlowErrorWrapper"
 import { FlowTestSuiteBuilder } from "./testSuites/flowTestSuiteBuilder"
 import { EventTestSuiteBuilder } from "./testSuites/eventTestSuiteBuilder"
 import { waitForEventWrapper } from "./flowActions/waitForEvent/waitForEventWrapper"
+import { listenForEventWrapper } from "./flowActions/listenForEvent/listenForEventWrapper"
 
 export const emit = emitWrapper
 
@@ -17,6 +19,10 @@ export const askFor = askForWrapper
 export const callService = callServiceWrapper
 
 export const waitForEvent = waitForEventWrapper
+
+export const listenForEvent = listenForEventWrapper
+
+export const FlowError = FlowErrorWrapper
 
 export const importFlows = flowImport
 

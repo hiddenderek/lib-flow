@@ -1,5 +1,4 @@
 import {FlowTestSuite, EventTestSuite} from '../../../src/index'
-import { IMeta } from '../../../src/interfaces/IMeta'
 import { CLIENT_DETAILS } from '../../utils/auth'
 
 describe('emitFlow', () => {
@@ -11,10 +10,11 @@ describe('emitFlow', () => {
     })
 
     it('should emit an event', async () => {
+        await eventTestSuite.listenForEvent('emitFlowTrigger')
         await flowTestSuite.start({hi: 'hello'})
-        // const event = await eventTestSuite.waitForEvent('emitFlowTrigger', undefined, flowTestSuite.requestId)
-        // expect(event.name).toEqual('emitFlowTrigger')
-        // expect(event.payload).toEqual({numbers: 42})
+        const event = await eventTestSuite.waitForEvent('emitFlowTrigger', undefined, flowTestSuite.requestId)
+        expect(event.name).toEqual('track.emitFlowTrigger')
+        expect(event.payload).toEqual({numbers: 42})
         expect(flowTestSuite.responsePayload).toEqual('hello')
     })
 })

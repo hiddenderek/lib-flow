@@ -1,0 +1,1 @@
+export type error = "FlowError" | "NotFoundError" | "BadRequestError" | "UnauthorizedError" | "FlowCommandFailedError"

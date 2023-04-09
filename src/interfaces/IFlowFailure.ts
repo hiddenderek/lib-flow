@@ -1,7 +1,10 @@
+import { error } from "../types/error";
+
 export interface IFlowFailure {
-    requestID: string, 
+    requestID?: string, 
     message: string, 
-    data: Record<string, any>,
-    name: "NotFoundError" | "BadRequestError" | "UnauthorizedError",
-    code: number
+    data?: Record<string, any>,
+    name: error,
+    code: number,
+    stack?: any
 }

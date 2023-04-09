@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from "axios"
 import { IClientDetails } from "../interfaces/IClientDetails"
 import config from "../config"
+import { AllowedRequests } from "../types/allowedRequests"
 
 
 
@@ -19,6 +20,9 @@ export class FlowTestSuiteBuilder  {
        this.flowId = flowId
        this.baseURL = process.env.API_GATEWAY_URL || `http://${config.host.hostname}:${config.host.port}`
     }
+
+    private tenantId = process?.env?.CLIENT_TENANT || 'nelnet'
+
     public init = async (clientDetails: IClientDetails, flowId: string) : Promise<FlowTestSuiteBuilder>=> {
         // TODO: disable this placeholder-token and research authentication further
         const token = "placeholder-token"
@@ -31,7 +35,7 @@ export class FlowTestSuiteBuilder  {
         //         }
         //     }
         // )
-        console.log(this.baseURL)
+
         const axiosClient = axios.create({
             baseURL: this.baseURL,
             headers: {
@@ -43,9 +47,9 @@ export class FlowTestSuiteBuilder  {
         return new FlowTestSuiteBuilder(axiosClient, flowId)
     }
 
-    public start = async (input: Record<string, any>) => {
-        const result = await this.flowClient?.post(
-            `v${config.flow.version}/flow/start/${this.flowId}`,
+    public start = async (input?: Record<string, any>, method?: AllowedRequests) => {
+        const result = await this.flowClient![method ?? "post"](
+            `v${config.flow.version}/flow/start/${this.tenantId}/${this.flowId}`,
             input
         )
         this.executionId = result?.data?.id
@@ -54,9 +58,8 @@ export class FlowTestSuiteBuilder  {
         this.responsePayload = result?.data?.continuation?.result || result?.data?.continuation?.command
     }
     public resume = async (executionId: string, resumeWith: Record<string, any>) => {
-        console.log(`PATH: v${config.flow.version}/flow/resume/${this.flowId}`)
         const result = await this.flowClient?.post(
-            `v${config.flow.version}/flow/resume/${this.flowId}`,
+            `v${config.flow.version}/flow/resume/${this.tenantId}/${this.flowId}`,
             {executionId, resumeWith}
         )
         this.executionId = executionId

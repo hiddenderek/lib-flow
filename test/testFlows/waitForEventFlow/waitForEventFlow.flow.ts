@@ -1,4 +1,4 @@
-import Flow, {emit, waitForEvent} from "../../../src/index";
+import Flow, {emit, listenForEvent, waitForEvent} from "../../../src/index";
 import { add } from "../shared/functions/add";
 export default new Flow({
     id: 'waitForEventFlow',
@@ -18,9 +18,10 @@ export default new Flow({
     body: async function*([input, meta]) {
         console.log('helloProp: ' + input.helloProp)
         yield* add(20, 50)
-        yield emit('waitForEventFlowTrigger')
+        yield listenForEvent('emitFlowTrigger')
+        yield emit('waitForEventFlowTrigger', undefined, true)
         yield* add(20, 50)
-        const result = (yield waitForEvent('emitFlowTrigger')) as { name: string}
+        const result = yield waitForEvent('emitFlowTrigger')
         yield* add(20, 50)
         console.log(result)
         return result.name

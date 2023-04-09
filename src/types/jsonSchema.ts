@@ -53,5 +53,5 @@ export type NotSchema = {
     not: ValueSchema;
 };
 
-export type JsonSchema = PrimitiveSchema | ComplexSchema | OperatorSchema;
+export type JsonSchema = PrimitiveSchema | ComplexSchema | OperatorSchema | undefined;
 
