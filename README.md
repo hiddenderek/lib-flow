@@ -491,7 +491,7 @@ Flows come with in depth logging out of the box to ease your debugging experienc
 Here is an example of a flow log:
 
 ```
-app_1       | {"mod":"Flow Runtime","flow":{},"msg":"Publishing event with name flow.scheduleFlow.completed (tracking id: f1e8c537-dfd9-411b-b15f-dad27ad0c147) to exchange microserviceExchange with data: {\"flowId\":\"scheduleFlow\",\"executionId\":\"caff248a-65b0-421b-a39a-3658934ffe6d\",\"requestId\":\"656b2f1b-7863-4c03-a148-9c05ad7c434a\",\"stateless\":true}","usr":{"tenant":{}},"http":{"request_start_time":"2023-04-09T15:43:00.120Z","action":{"name":"v0.flow.start"}}}
+app_1       | {"mod":"Flow Runtime","flow":{"id":"emitFlow","executionId":"c29cb9b7-c351-4d4d-bd2f-46ea2ebc44fe","executionSource":"request"},"msg":"Publishing event with name flow.emitFlow.completed (tracking id: f1e8c537-dfd9-411b-b15f-dad27ad0c147) to exchange microserviceExchange with data: {\"flowId\":\"emitFlow\",\"executionId\":\"caff248a-65b0-421b-a39a-3658934ffe6d\",\"requestId\":\"656b2f1b-7863-4c03-a148-9c05ad7c434a\",\"stateless\":true}","usr":{"tenant":{}},"http":{"request_start_time":"2023-04-09T15:43:00.120Z","action":{"name":"v0.flow.start"}}}
 ```
 
 Flow logs contain the following structure:
