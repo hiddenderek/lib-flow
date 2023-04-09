@@ -281,7 +281,7 @@ export default new Flow({
 ```
 ### Flow return value
 
-The return value of the body, if successful, contains the following:
+The response value of a flow, if successful, contains the following:
 
 ```typescript
 export interface IFlowSuccess {
@@ -298,7 +298,7 @@ export interface IFlowSuccess {
 }
 ```
 
-When you return a value, if it contains 'resStatus' as a property, the response status will automatically be set to that number.
+When you return a value in a flow body, if the value contains 'resStatus' as a property, the response status will automatically be set to that number.
 
 Example:
 
