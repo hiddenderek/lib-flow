@@ -498,7 +498,6 @@ You will need a rabbitmq and opa container in your docker compose file, along wi
     volumes:
       - ./src:/app/src
       - ./tsconfig.json:/app/tsconfig.json
-      - ./webpack.config.js:/app/webpack.config.js
     environment:
       - NODE_ENV=development
     command: npm run dev
