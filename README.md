@@ -1,6 +1,6 @@
-# microservice-lib-flow
+# Flow library (experiment)
 
-This flow library provides a back end suite of tools compiled together into one easy-to-use light weight package for your convenience. This includes (but is not limited to) full functionality REST API endpoints, built in AMQP producers/consumers (and ways to track messages) for event driven architecture, scheduled CRON jobs, rego policy validation, in depth logging, and a test suite.
+This library provides a back end suite of tools compiled together into one easy-to-use light weight package for your convenience. This includes (but is not limited to) full functionality REST API endpoints, built in RabbitMQ producers/consumers (and ways to track messages) for event driven architecture, async await support, scheduled CRON jobs, rego policy validation, in depth logging, and a test suite. Also, its about 10% faster than regular flows ( For example, a per flow average of .76 seconds to run 100 clReprocessChangeFile flows instead of .85 locally )
 
 ## How do flows work?
 
@@ -9,7 +9,7 @@ As mentioned before, flows are a suite of tools for backend operations.
 You can create a flow like so:
 
 ```typescript
-import Flow from "@hiddenderek/microservice-lib-flow-dc"; 
+import Flow from "microservice-lib-flow-dc"; 
 
 export default new Flow({
     id: 'exampleFlow',
@@ -30,7 +30,6 @@ export default new Flow({
     body: async function*([input]) {
         const {numbers, hi} = input.data
 
-        
         await new Promise(resolve => setTimeout(resolve, 2000));
 
         yield askFor({
@@ -136,7 +135,7 @@ A short description of the flow and how it works. Does nothing yet.
 
 ### `stateless`
 
-Determines if your flow will record its state in the database. Does nothing yet.
+Determines if your flow will cache its generator function instance or not. AskFor will not work if it is stateless,
 
 ### `triggers`
 
@@ -561,6 +560,8 @@ Flows require a few steps to set up, so lets get started!
 
 ### Installing packages
 
+(Note: these steps will change when docker image is hosted to have all packages pre installed)
+
 Make sure to add the following libraries in your package.json:
 
 ```json
@@ -571,7 +572,7 @@ Make sure to add the following libraries in your package.json:
     "typescript": "^4.8.4"
   },
   "dependencies": {
-    "@hiddenderek/microservice-lib-flow-dc": "1.1.0",
+    "microservice-lib-flow-dc": "1.1.0",
     "amqplib": "^0.10.3",
     "express": "^4.18.2",
     "ts-node": "^10.9.1",
@@ -612,19 +613,17 @@ You will need a rabbitmq and opa container in your docker compose file, along wi
       - rabbitmq
     volumes:
       - ./src:/app/src
-      - ./tsconfig.json:/app/tsconfig.json
-    environment:
-      - NODE_ENV=development
     command: npm run dev
 ```
 
 You will need a docker file for your app container that sets up your flow environment properly.
 
+(Note: package json copy, ARG, and install step wont be necessary when docker image is hosted. You will just need to copy the flow folder over and run the server)
+
 ```dockerfile
 FROM node:16
 WORKDIR /app
 COPY package.json .
-COPY .npmrc .
 ARG NODE_ENV
 RUN if [ "$NODE_ENV" = "development" ]; \
         then npm install && npm install ts-node -g; \
@@ -645,7 +644,7 @@ example flow server:
 ```typescript
 import express from 'express'
 import processEnv from 'dotenv'
-import { importFlows } from "@hiddenderek/microservice-lib-flow-dc"
+import { importFlows } from "microservice-lib-flow-dc"
 
 processEnv.config()
 const app = express()
@@ -711,7 +710,7 @@ The flow library comes with a built in flow test suite.
 Here is an example of using one:
 
 ```typescript
-import {FlowTestSuite, EventTestSuite} from  "@hiddenderek/microservice-lib-flow-dc"
+import {FlowTestSuite, EventTestSuite} from  "microservice-lib-flow-dc"
 import { CLIENT_DETAILS } from '../../utils/auth'
 
 describe('emitFlow', () => {
@@ -823,4 +822,3 @@ you will need to pass in the request id in the third parameter or it will not wo
     await flowTestSuite.start({hi: 'hello'})
     const event = await eventTestSuite.waitForEvent('emitFlowTrigger', 5000, flowTestSuite.requestId)
 ```
-

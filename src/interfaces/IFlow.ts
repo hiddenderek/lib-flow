@@ -8,10 +8,10 @@ export interface IFlow<I extends Readonly<JsonSchema>> {
     id: string,
     name: string,
     stateless: boolean,
-    triggers?: {events?: string[], schedules?: string[]},
+    triggers?: { events?: string[], schedules?: string[] },
     method?: AllowedRequests,
     input?: I,
-    body: ([input, meta]: [JsonSchemaToObject<I>, IMeta], ) => AsyncGenerator<any, any, any>
+    body: ([input, meta]: [JsonSchemaToObject<I>, IMeta],) => AsyncGenerator<any, any, any>
 }
 
 

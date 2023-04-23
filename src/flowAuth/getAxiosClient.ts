@@ -4,11 +4,11 @@ import { getToken } from "./getToken"
 
 export async function getAxiosClient(token?: string) {
     if (!token) {
-        const {access_token} = await getToken()
+        const { access_token } = await getToken()
         token = access_token
     }
     const axiosClient = axios.create({
-        baseURL: process.env.API_GATEWAY_URL || `http://${config.host.hostname}:${config.host.port}`,
+        baseURL: `http://api-gateway:3000`,
         headers: {
             Authorization: `Bearer ${token}`
         }

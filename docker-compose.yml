@@ -9,35 +9,23 @@ services:
     ports:
       - "8111:8111"
     env_file:
-    - .env
+      - .env
     restart: always
     depends_on:
-      - postgres
+      - opa
       - rabbitmq
     volumes:
       - ./src:/app/src
-      - ./tsconfig.json:/app/tsconfig.json
-      - ./webpack.config.js:/app/webpack.config.js
     environment:
       - NODE_ENV=development
     command: npm run dev
-  postgres:
-    build: 
-      context: .
-      dockerfile: Dockerfile_db
-    ports: 
-      - "5434:5432"
-    restart: always
-    environment:
-      - POSTGRES_PASSWORD=D@c77357
-      - POSTGRES_DB=gamecreator
   rabbitmq:
     image: rabbitmq:3-management
     ports:
       - 5672:5672
       - 15672:15672
   opa:
-    image: openpolicyagent/opa:0.51.0
+    image: openpolicyagent/opa:0.45.0
     restart: on-failure
     volumes:
       - ./test/testFlows/policies/:/data

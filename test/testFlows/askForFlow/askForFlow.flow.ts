@@ -1,10 +1,10 @@
-import Flow, {askFor, emit, listenForEvent, waitForEvent} from "../../../src/index";
+import Flow, { askFor, emit, listenForEvent, waitForEvent } from "../../../src/index";
 
 export default new Flow({
     id: 'askForFlow',
     name: 'a new flow',
-    stateless: true,
-    triggers: { },
+    stateless: false,
+    triggers: {},
     input: {
         type: "object",
         properties: {
@@ -23,7 +23,7 @@ export default new Flow({
         required: ['numbers'],
         additionalProperties: false,
     } as const,
-    body: async function*([input]) {
+    body: async function* ([input]) {
         yield listenForEvent('testEvent1')
         yield listenForEvent('testEvent2')
         console.log('wait')
@@ -43,7 +43,7 @@ export default new Flow({
         })
         console.log('RESUMED ' + JSON.stringify(rob))
 
-        yield emit('testEvent1', {numbers: "hi"}, true)
+        yield emit('testEvent1', { numbers: "hi" }, true)
         yield waitForEvent('testEvent1')
         const rob2 = yield askFor({
             type: 'object',
@@ -57,9 +57,8 @@ export default new Flow({
 
         console.log('RESUMED! ' + JSON.stringify(rob2))
 
-        yield emit('testEvent2', {numbers: "hi"}, true)
+        yield emit('testEvent2', { numbers: "hi" }, true)
         yield waitForEvent('testEvent2')
         return rob2
     }
 })
-
