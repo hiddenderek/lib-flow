@@ -41,4 +41,3 @@ export default new Flow({
         return bob
     }
 })
-

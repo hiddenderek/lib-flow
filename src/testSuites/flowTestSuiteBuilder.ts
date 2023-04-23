@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from "axios"
+import axios, { AxiosInstance, AxiosResponse } from "axios"
 import { IClientDetails } from "../interfaces/IClientDetails"
 import config from "../config"
 import { AllowedRequests } from "../types/allowedRequests"
@@ -6,27 +6,28 @@ import { AllowedRequests } from "../types/allowedRequests"
 
 
 
-export class FlowTestSuiteBuilder  {
+export class FlowTestSuiteBuilder {
     flowClient?: AxiosInstance
     flowId?: string
     requestId?: string
     baseURL: string
     executionId?: string
-    status?: "completed" | "pending" | "failed" 
+    status?: "completed" | "pending" | "failed"
     responsePayload?: Record<string, any>
 
-    constructor(flowClient?: AxiosInstance, flowId?: string) { 
-       this.flowClient = flowClient
-       this.flowId = flowId
-       this.baseURL = process.env.API_GATEWAY_URL || `http://${config.host.hostname}:${config.host.port}`
+    constructor(flowClient?: AxiosInstance, flowId?: string) {
+        this.flowClient = flowClient
+        this.flowId = flowId
+        this.baseURL = process.env.API_GATEWAY_URL || `http://${config.host.hostname}:${config.host.port}`
     }
 
     private tenantId = process?.env?.CLIENT_TENANT || 'nelnet'
 
-    public init = async (clientDetails: IClientDetails, flowId: string) : Promise<FlowTestSuiteBuilder>=> {
+    public init = async (clientDetails: IClientDetails, flowId: string): Promise<FlowTestSuiteBuilder> => {
         // TODO: disable this placeholder-token and research authentication further
         const token = "placeholder-token"
-        // const token: AxiosResponse<{access_token: string}> = await axios.post(
+
+        // const token: AxiosResponse<{ access_token: string }> = await axios.post(
         //     `${this.baseURL}/v4/iam/oauth2/token`,
         //     clientDetails,
         //     {
@@ -43,7 +44,7 @@ export class FlowTestSuiteBuilder  {
                 "Content-Type": "application/json"
             }
         })
-        
+
         return new FlowTestSuiteBuilder(axiosClient, flowId)
     }
 
@@ -60,7 +61,7 @@ export class FlowTestSuiteBuilder  {
     public resume = async (executionId: string, resumeWith: Record<string, any>) => {
         const result = await this.flowClient?.post(
             `v${config.flow.version}/flow/resume/${this.tenantId}/${this.flowId}`,
-            {executionId, resumeWith}
+            { executionId, resumeWith }
         )
         this.executionId = executionId
         this.requestId = result?.data?.requestId

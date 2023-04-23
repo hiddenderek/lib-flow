@@ -1,16 +1,16 @@
 import axios, { AxiosResponse } from "axios"
 import config from "../config"
 
-export const authenticateToken = async (token?: string) : Promise<'Success' | 'Null' | 'Error'> => {
-    // TODO: disable this return and research authentication further
+export const authenticateToken = async (token?: string): Promise<'Success' | 'Null' | 'Error'> => {
+    // TODO: disable this return 
     return 'Success'
 
     if (!token) {
         return 'Null'
     }
     try {
-        const baseURL = process.env.API_GATEWAY_URL || `http://${config.host.hostname}:${config.host.port}`
-        const result: AxiosResponse<{active: boolean}> = await axios.post(
+        const baseURL = `http://api-gateway:3000`
+        const result: AxiosResponse<{ active: boolean }> = await axios.post(
             `${baseURL}/v4/iam/introspect`,
             {
                 token,
@@ -21,6 +21,7 @@ export const authenticateToken = async (token?: string) : Promise<'Success' | 'N
                 }
             }
         )
+        console.log('RESULT DATA: ' + JSON.stringify(result.data))
         if (result.data?.active) {
             return 'Success'
         } else {
@@ -28,6 +29,8 @@ export const authenticateToken = async (token?: string) : Promise<'Success' | 'N
         }
 
     } catch (e) {
+        console.log('FAILED REQUESTING DATA')
+        console.log(JSON.stringify(e))
         return 'Error'
     }
 }

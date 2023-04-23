@@ -19,4 +19,3 @@ export default new Flow({
         return `Schedule completed at ${meta.startTime}`
     }
 })
-

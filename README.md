@@ -1,6 +1,6 @@
-# microservice-lib-flow
+# Flow library (experiment)
 
-This flow library provides a back end suite of tools compiled together into one easy-to-use light weight package for your convenience. This includes (but is not limited to) full functionality REST API endpoints, built in AMQP producers/consumers (and ways to track messages), scheduled CRON jobs, rego policy validation, in depth logging, and a test suite.
+This library provides a back end suite of tools compiled together into one easy-to-use light weight package for your convenience. This includes (but is not limited to) full functionality REST API endpoints, built in RabbitMQ producers/consumers (and ways to track messages) for event driven architecture, async await support, scheduled CRON jobs, rego policy validation, in depth logging, and a test suite. Also, its about 10% faster than regular flows ( For example, a per flow average of .76 seconds to run 100 clReprocessChangeFile flows instead of .85 locally )
 
 ## How do flows work?
 
@@ -9,7 +9,7 @@ As mentioned before, flows are a suite of tools for backend operations.
 You can create a flow like so:
 
 ```typescript
-import Flow from "@hiddenderek/microservice-lib-flow-dc"; 
+import Flow from "microservice-lib-flow-dc"; 
 
 export default new Flow({
     id: 'exampleFlow',
@@ -30,7 +30,6 @@ export default new Flow({
     body: async function*([input]) {
         const {numbers, hi} = input.data
 
-        
         await new Promise(resolve => setTimeout(resolve, 2000));
 
         yield askFor({
@@ -136,7 +135,7 @@ A short description of the flow and how it works. Does nothing yet.
 
 ### `stateless`
 
-Determines if your flow will record its state in the database. Does nothing yet.
+Determines if your flow will cache its generator function instance or not. AskFor will not work if it is stateless,
 
 ### `triggers`
 
@@ -281,7 +280,7 @@ export default new Flow({
 ```
 ### Flow return value
 
-The return value of the body, if successful, contains the following:
+The response value of a flow, if successful, contains the following:
 
 ```typescript
 export interface IFlowSuccess {
@@ -298,7 +297,7 @@ export interface IFlowSuccess {
 }
 ```
 
-When you return a value, if it contains 'resStatus' as a property, the response status will automatically be set to that number.
+When you return a value in a flow body, if the value contains 'resStatus' as a property, the response status will automatically be set to that number.
 
 Example:
 
@@ -439,12 +438,129 @@ Returns the event name and payload
         const result = yield waitForEvent('emitFlowTrigger')
         console.log(result.name, result.payload)
 ```
+## Error handling
+
+You can throw an error within the body of a flow using FlowError
+
+```typescript
+        throw new FlowError('Something happened! Oh no!')
+```
+
+This will stop the execution of a flow result in the response value structure being like so:
+
+```typescript
+export interface IFlowFailure {
+    requestID?: string, 
+    message: string, 
+    data?: Record<string, any>,
+    name: error,
+    code: number,
+    stack?: any
+}
+```
+
+Here is an example of how the response value would look after a flowError:
+
+```typescript
+    it('should fail at flow error', async () => {
+        try {
+        await flowTestSuite.start({schemaToFail: ['hello']})
+        } catch (e: any) {
+            expect(e.response.data).toEqual(
+                {
+                    name: "BadRequestError",
+                    code: 500,
+                    requestID: expect.any(String),
+                    data: {
+                        code: 500,
+                        message: "Something happened! Oh no!",
+                        name: 'FlowError'
+                    },
+                   
+                }
+            )
+        }
+    })
+```
+
+## Logging
+
+Flows come with in depth logging out of the box to ease your debugging experience. All the meta and environment information gets attached to each log to give you as much information as possible.
+
+Here is an example of a flow log:
+
+```
+app_1       | {"mod":"Flow Runtime","flow":{"id":"emitFlow","executionId":"c29cb9b7-c351-4d4d-bd2f-46ea2ebc44fe","executionSource":"request"},"msg":"Publishing event with name flow.emitFlow.completed (tracking id: f1e8c537-dfd9-411b-b15f-dad27ad0c147) to exchange microserviceExchange with data: {\"flowId\":\"emitFlow\",\"executionId\":\"caff248a-65b0-421b-a39a-3658934ffe6d\",\"requestId\":\"656b2f1b-7863-4c03-a148-9c05ad7c434a\",\"stateless\":true}","usr":{"tenant":{}},"http":{"request_start_time":"2023-04-09T15:43:00.120Z","action":{"name":"v0.flow.start"}}}
+```
+
+Flow logs contain the following structure:
+
+```typescript
+export interface IFlowLog {
+    mod: "Flow Output" | "Flow Runtime",
+    flow: {
+        id?: string, 
+        executionId?: string, 
+        executionSource?: executionSource, 
+    },
+    msg: string,
+    error?: string,
+    usr: {
+        tenant: {id?: string},
+    },
+    token_id?: string,
+    http: {
+        requestId?: string,
+        request_start_time: string,
+        action: {
+            name: string
+        } | {}
+    }
+}
+```
+
+### `mod`
+
+Informs you about the context of where the message originated. 'Flow Runtime' means outside the flow body (validation, authentication, unknown errors, etc.). 'Flow Output' means inside the flow body (flow actions, console logs, errors)
+
+### `flow`
+
+Information about the flow itself.
+
+### `msg`
+
+The message sent with the log.
+
+### `error`
+
+Any errors associated with the message
+
+### `usr`
+
+The user information, currently only includes the tenantId
+
+### `token_id`
+
+The token associated with the request, if any.
+
+### `http`
+
+Request information if the flow was triggered by a request. Includes requestId , start time,  and the associated action ('flow.start'/'flow.resume')
+
+
+If you use console.log, console.info, or console.error inside the flow body, it will output the provided message under the 'msg' field and change the 'mod' value to 'Flow Output' to signify it came from inside the flow body.
+
+```
+app_1       | {"mod":"Flow Output","flow":{"id":"urlParamFlow/:testParam","executionId":"c29cb9b7-c351-4d4d-bd2f-46ea2ebc44fe","executionSource":"request"},"msg":{"testParam":"testValue"},"usr":{"tenant":{"id":"nelnet"}},"token_id":"placeholder-token","http":{"requestId":"2214d2e9-9b84-4fa6-b65a-2277ef80b210","request_start_time":"2023-04-09T16:04:32.924Z","action":{"name":"v0.flow.start"}}} 
+```
 
 ## Setting up flows
 
 Flows require a few steps to set up, so lets get started!
 
 ### Installing packages
+
+(Note: these steps will change when docker image is hosted to have all packages pre installed)
 
 Make sure to add the following libraries in your package.json:
 
@@ -456,7 +572,7 @@ Make sure to add the following libraries in your package.json:
     "typescript": "^4.8.4"
   },
   "dependencies": {
-    "@hiddenderek/microservice-lib-flow-dc": "1.1.0",
+    "microservice-lib-flow-dc": "1.1.0",
     "amqplib": "^0.10.3",
     "express": "^4.18.2",
     "ts-node": "^10.9.1",
@@ -497,20 +613,17 @@ You will need a rabbitmq and opa container in your docker compose file, along wi
       - rabbitmq
     volumes:
       - ./src:/app/src
-      - ./tsconfig.json:/app/tsconfig.json
-      - ./webpack.config.js:/app/webpack.config.js
-    environment:
-      - NODE_ENV=development
     command: npm run dev
 ```
 
 You will need a docker file for your app container that sets up your flow environment properly.
 
+(Note: package json copy, ARG, and install step wont be necessary when docker image is hosted. You will just need to copy the flow folder over and run the server)
+
 ```dockerfile
 FROM node:16
 WORKDIR /app
 COPY package.json .
-COPY .npmrc .
 ARG NODE_ENV
 RUN if [ "$NODE_ENV" = "development" ]; \
         then npm install && npm install ts-node -g; \
@@ -531,7 +644,7 @@ example flow server:
 ```typescript
 import express from 'express'
 import processEnv from 'dotenv'
-import { importFlows } from "@hiddenderek/microservice-lib-flow-dc"
+import { importFlows } from "microservice-lib-flow-dc"
 
 processEnv.config()
 const app = express()
@@ -597,7 +710,7 @@ The flow library comes with a built in flow test suite.
 Here is an example of using one:
 
 ```typescript
-import {FlowTestSuite, EventTestSuite} from  "@hiddenderek/microservice-lib-flow-dc"
+import {FlowTestSuite, EventTestSuite} from  "microservice-lib-flow-dc"
 import { CLIENT_DETAILS } from '../../utils/auth'
 
 describe('emitFlow', () => {
@@ -709,4 +822,3 @@ you will need to pass in the request id in the third parameter or it will not wo
     await flowTestSuite.start({hi: 'hello'})
     const event = await eventTestSuite.waitForEvent('emitFlowTrigger', 5000, flowTestSuite.requestId)
 ```
-

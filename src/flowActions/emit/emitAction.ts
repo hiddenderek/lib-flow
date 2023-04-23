@@ -14,12 +14,11 @@ export const emitAction = async (options: IEmitAction) => {
     const trackingId = uuid()
     await channel.assertExchange(exchangeName, "direct")
 
-    const flowInfo : IFlowInfo = {
+    const flowInfo: IFlowInfo = {
         id: options.meta?.flowId,
-        executionId: options.meta?.executionId, 
+        executionId: options.meta?.executionId,
         tenantId: options.meta?.tenantId,
-        requestId:  options.meta?.requestId,
-        token: options.meta?.token,
+        requestId: options.meta?.requestId,
         flowMode: options.meta?.flowMode
     }
 
@@ -66,7 +65,7 @@ export const emitAction = async (options: IEmitAction) => {
 
     await channel.close()
     await connection.close()
-    
 
-    return {status: 200, data: {}}
+
+    return { status: 200, data: { trackingId } }
 }

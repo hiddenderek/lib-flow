@@ -22,4 +22,3 @@ export default new Flow({
         throw new FlowError('Something happened! Oh no!')
     }
 })
-

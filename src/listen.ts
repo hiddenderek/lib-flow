@@ -68,4 +68,3 @@ export async function listen<I extends Readonly<JsonSchema>>(bindingKey: string,
         }
     })
 }
-
